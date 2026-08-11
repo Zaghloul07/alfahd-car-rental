@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env*.example
 
 # vercel
 .vercel
@@ -39,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# loose source assets not used by the app (public/logo.jpg and
+# public/logo-dark.png are the copies actually referenced in code)
+/DriveHub_v3_3Milestone_Plan.pdf
+/Logo.jpg
+/Logo Black Background.png
