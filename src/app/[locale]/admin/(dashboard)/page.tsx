@@ -24,53 +24,55 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <table className="w-full text-start text-sm">
-          <thead className="border-b border-border bg-muted text-foreground/60">
-            <tr>
-              <th className="px-4 py-3 text-start font-medium">{t("car")}</th>
-              <th className="px-4 py-3 text-start font-medium">{t("type")}</th>
-              <th className="px-4 py-3 text-start font-medium">{t("status")}</th>
-              <th className="px-4 py-3 text-start font-medium">{t("price")}</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {cars.map((car) => (
-              <tr key={car.id} className="border-b border-border last:border-0">
-                <td className="flex items-center gap-3 px-4 py-3">
-                  <div className="relative h-12 w-16 overflow-hidden rounded-md bg-placeholder">
-                    <Image
-                      src={car.images[0] ?? "/cars/sedan-silver.svg"}
-                      alt={car.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <span className="font-medium">{car.title}</span>
-                </td>
-                <td className="px-4 py-3 capitalize">{car.listing_type}</td>
-                <td className="px-4 py-3 capitalize">{car.status}</td>
-                <td className="px-4 py-3">
-                  {formatEGP(car.listing_type === "rent" ? car.daily_price : car.sale_price)}
-                  {car.listing_type === "rent" && (
-                    <span className="text-foreground/50">{t("perDay")}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-end">
-                  <div className="flex justify-end gap-3">
-                    <Link
-                      href={`/admin/cars/${car.id}/edit`}
-                      className="font-medium text-brand hover:underline"
-                    >
-                      {t("edit")}
-                    </Link>
-                    <DeleteCarButton id={car.id} />
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-start text-sm">
+            <thead className="border-b border-border bg-muted text-foreground/60">
+              <tr>
+                <th className="px-4 py-3 text-start font-medium">{t("car")}</th>
+                <th className="px-4 py-3 text-start font-medium">{t("type")}</th>
+                <th className="px-4 py-3 text-start font-medium">{t("status")}</th>
+                <th className="px-4 py-3 text-start font-medium">{t("price")}</th>
+                <th className="px-4 py-3" />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {cars.map((car) => (
+                <tr key={car.id} className="border-b border-border last:border-0">
+                  <td className="flex items-center gap-3 px-4 py-3">
+                    <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-placeholder">
+                      <Image
+                        src={car.images[0] ?? "/cars/sedan-silver.svg"}
+                        alt={car.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <span className="whitespace-nowrap font-medium">{car.title}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 capitalize">{car.listing_type}</td>
+                  <td className="whitespace-nowrap px-4 py-3 capitalize">{car.status}</td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {formatEGP(car.listing_type === "rent" ? car.daily_price : car.sale_price)}
+                    {car.listing_type === "rent" && (
+                      <span className="text-foreground/50">{t("perDay")}</span>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-end">
+                    <div className="flex justify-end gap-3">
+                      <Link
+                        href={`/admin/cars/${car.id}/edit`}
+                        className="font-medium text-brand hover:underline"
+                      >
+                        {t("edit")}
+                      </Link>
+                      <DeleteCarButton id={car.id} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {cars.length === 0 && (
           <p className="p-6 text-center text-foreground/60">{t("noCars")}</p>
         )}

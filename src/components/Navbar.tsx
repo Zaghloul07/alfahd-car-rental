@@ -21,28 +21,28 @@ export default async function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-white/95 backdrop-blur dark:bg-black/95">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/">
-          <Logo className="h-16 w-auto" priority />
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
+        <Link href="/" className="shrink-0">
+          <Logo className="h-10 w-auto sm:h-16" priority />
         </Link>
-        <nav className="flex items-center gap-4 text-sm font-medium text-foreground/80">
+        <nav className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1 text-xs font-medium text-foreground/80 sm:gap-x-4 sm:text-sm">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-brand">
+            <Link key={link.href} href={link.href} className="whitespace-nowrap hover:text-brand">
               {link.label}
             </Link>
           ))}
           {customer ? (
-            <Link href="/account" className="hover:text-brand">
+            <Link href="/account" className="whitespace-nowrap hover:text-brand">
               {t("myAccount")}
             </Link>
           ) : (
             <>
-              <Link href="/login" className="hover:text-brand">
+              <Link href="/login" className="whitespace-nowrap hover:text-brand">
                 {t("signIn")}
               </Link>
               <Link
                 href="/signup"
-                className="rounded-lg bg-accent px-4 py-1.5 text-white hover:bg-accent/90"
+                className="whitespace-nowrap rounded-lg bg-accent px-3 py-1 text-white hover:bg-accent/90 sm:px-4 sm:py-1.5"
               >
                 {t("signUp")}
               </Link>

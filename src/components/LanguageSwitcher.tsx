@@ -13,7 +13,7 @@ export default function LanguageSwitcher() {
     <button
       type="button"
       onClick={() => router.replace(pathname, { locale: other })}
-      className="flex h-9 items-center justify-center rounded-lg border border-border px-2.5 text-sm font-medium text-foreground/70 hover:bg-muted"
+      className="flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-border px-2 text-xs font-medium text-foreground/70 hover:bg-muted sm:px-2.5 sm:text-sm"
     >
       {other === "ar" ? "العربية" : "English"}
     </button>

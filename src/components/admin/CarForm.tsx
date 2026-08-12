@@ -54,7 +54,7 @@ export default function CarForm({ action, car }: { action: Action; car?: CarRow 
         </select>
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label={t("make")}>
           <select
             name="make"
@@ -94,7 +94,7 @@ export default function CarForm({ action, car }: { action: Action; car?: CarRow 
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label={t("year")}>
           <select name="year" defaultValue={car?.year ? String(car.year) : ""} required className={inputClass}>
             <option value="" disabled>
@@ -134,7 +134,7 @@ export default function CarForm({ action, car }: { action: Action; car?: CarRow 
         />
       </Field>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Field label={t("category")}>
           <select name="category" defaultValue={car?.category ?? ""} className={inputClass}>
             <option value="">—</option>
@@ -175,7 +175,7 @@ export default function CarForm({ action, car }: { action: Action; car?: CarRow 
       {listingType === "rent" ? (
         <div className="rounded-xl border border-border p-4">
           <p className="mb-3 text-sm font-semibold text-brand">{t("rentalPricing")}</p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label={t("rentTerm")}>
               <select name="rent_term" defaultValue={car?.rent_term ?? "short_term"} className={inputClass}>
                 <option value="short_term">{t("shortTerm")}</option>
