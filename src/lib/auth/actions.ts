@@ -40,5 +40,5 @@ export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   const locale = await getLocale();
-  redirect({ href: "/admin/login", locale });
+  redirect({ href: "/", locale });
 }

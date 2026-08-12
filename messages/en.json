@@ -204,6 +204,7 @@
     "installmentsAvailable": "Installments available",
     "inspected": "Inspected",
     "photos": "Photos",
+    "removePhoto": "Remove photo",
     "save": "Save Listing",
     "saving": "Saving…"
   },
@@ -238,6 +239,7 @@
     "fuelPhoto": "Photo of fuel gauge",
     "bodyPhotos": "Photos of car body",
     "bodyPhotosHint": "Add photos of all sides showing the car's current condition.",
+    "removePhoto": "Remove photo",
     "customerSignature": "Customer signature",
     "signatureHint": "Hand the device to the customer to sign above.",
     "clearSignature": "Clear",

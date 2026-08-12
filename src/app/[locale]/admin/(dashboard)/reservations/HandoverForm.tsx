@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { submitHandover } from "@/lib/handovers/actions";
 import SignaturePad from "@/components/SignaturePad";
+import ImageUploadField from "@/components/ImageUploadField";
 import type { FuelLevel, HandoverType } from "@/lib/supabase/types";
 
 const FUEL_LEVELS: FuelLevel[] = ["empty", "quarter", "half", "three_quarter", "full"];
@@ -68,23 +69,23 @@ export default function HandoverForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <span className="mb-1 block text-sm font-medium">{t("odometerPhoto")}</span>
-          <input
+          <ImageUploadField
             name="odometer_photo"
-            type="file"
-            accept="image/*"
+            multiple={false}
             capture="environment"
             required
+            removeLabel={t("removePhoto")}
             className="w-full text-sm"
           />
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium">{t("fuelPhoto")}</span>
-          <input
+          <ImageUploadField
             name="fuel_photo"
-            type="file"
-            accept="image/*"
+            multiple={false}
             capture="environment"
             required
+            removeLabel={t("removePhoto")}
             className="w-full text-sm"
           />
         </label>
@@ -92,13 +93,12 @@ export default function HandoverForm({
 
       <label className="block">
         <span className="mb-1 block text-sm font-medium">{t("bodyPhotos")}</span>
-        <input
+        <ImageUploadField
           name="body_photos"
-          type="file"
-          accept="image/*"
-          capture="environment"
           multiple
+          capture="environment"
           required
+          removeLabel={t("removePhoto")}
           className="w-full text-sm"
         />
         <span className="mt-1 block text-xs text-foreground/50">{t("bodyPhotosHint")}</span>

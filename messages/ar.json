@@ -204,6 +204,7 @@
     "installmentsAvailable": "التقسيط متاح",
     "inspected": "مفحوصة",
     "photos": "الصور",
+    "removePhoto": "إزالة الصورة",
     "save": "حفظ الإعلان",
     "saving": "جارٍ الحفظ…"
   },
@@ -238,6 +239,7 @@
     "fuelPhoto": "صورة مؤشر الوقود",
     "bodyPhotos": "صور هيكل السيارة",
     "bodyPhotosHint": "أضف صورًا لجميع الجوانب توضح حالة السيارة الحالية.",
+    "removePhoto": "إزالة الصورة",
     "customerSignature": "توقيع العميل",
     "signatureHint": "سلّم الجهاز للعميل ليوقّع أعلاه.",
     "clearSignature": "مسح",

@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import ImageUploadField from "@/components/ImageUploadField";
 import type { CarFormState } from "@/lib/cars/actions";
 import type { CarRow } from "@/lib/supabase/types";
 import {
@@ -33,10 +33,6 @@ export default function CarForm({ action, car }: { action: Action; car?: CarRow 
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">
-      {car && (
-        <input type="hidden" name="existing_images" value={JSON.stringify(car.images)} />
-      )}
-
       <Field label={t("listingType")}>
         <select
           name="listing_type"
@@ -209,16 +205,13 @@ export default function CarForm({ action, car }: { action: Action; car?: CarRow 
       )}
 
       <Field label={t("photos")}>
-        <input name="images" type="file" accept="image/*" multiple className={inputClass} />
-        {car && car.images.length > 0 && (
-          <div className="mt-3 flex gap-2">
-            {car.images.map((src) => (
-              <div key={src} className="relative h-16 w-24 overflow-hidden rounded-md bg-placeholder">
-                <Image src={src} alt="" fill className="object-cover" />
-              </div>
-            ))}
-          </div>
-        )}
+        <ImageUploadField
+          name="images"
+          existingImages={car?.images ?? []}
+          existingFieldName={car ? "existing_images" : undefined}
+          removeLabel={t("removePhoto")}
+          className={inputClass}
+        />
       </Field>
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
