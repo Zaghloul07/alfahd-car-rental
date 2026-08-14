@@ -1,8 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { requireAdmin } from "@/lib/auth/dal";
 import CarForm from "@/components/admin/CarForm";
 import { createCar } from "@/lib/cars/actions";
 
 export default async function NewCarPage() {
+  await requireAdmin();
   const t = await getTranslations("AdminCarForm");
   return (
     <div>

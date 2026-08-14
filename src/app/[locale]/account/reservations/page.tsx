@@ -1,16 +1,19 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { requireCustomer } from "@/lib/auth/customer-dal";
+import { requireCustomer, hasSubmittedDocuments } from "@/lib/auth/customer-dal";
 import { getReservationsForCustomer } from "@/lib/reservations";
 import { getHandoversForReservation } from "@/lib/handovers";
 import { resolveHandoverForDisplay } from "@/lib/handovers/photos";
+import { getChargesForReservation } from "@/lib/reservations/charges";
 import { formatEGP } from "@/lib/format";
 import HandoverSummary from "@/components/HandoverSummary";
+import ChargesList from "@/components/ChargesList";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
   approved: "bg-brand/10 text-brand",
+  confirmed: "bg-brand/10 text-brand",
   rejected: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400",
   cancelled: "bg-muted text-foreground/60",
   delivered: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
@@ -32,6 +35,7 @@ export default async function MyReservationsPage() {
       handovers: HANDOVER_STATUSES.has(r.status)
         ? await Promise.all((await getHandoversForReservation(r.id)).map(resolveHandoverForDisplay))
         : [],
+      charges: r.status === "completed" ? await getChargesForReservation(r.id) : [],
     }))
   );
 
@@ -81,6 +85,21 @@ export default async function MyReservationsPage() {
               </span>
             </div>
 
+            {r.status === "approved" && (
+              <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-500/10 dark:text-amber-400">
+                {!hasSubmittedDocuments(customer) ? (
+                  <>
+                    {t("approvedNeedsDocs")}{" "}
+                    <Link href="/account/documents" className="font-medium underline">
+                      {t("uploadDocuments")}
+                    </Link>
+                  </>
+                ) : (
+                  t("approvedAwaitingPayment")
+                )}
+              </div>
+            )}
+
             {r.handovers.length > 0 && (
               <div className="mt-4 space-y-3 border-t border-border pt-4">
                 {r.handovers.map((h, i) => (
@@ -88,6 +107,8 @@ export default async function MyReservationsPage() {
                 ))}
               </div>
             )}
+
+            <ChargesList charges={r.charges} />
           </div>
         ))
       )}

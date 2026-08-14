@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/dal";
+import { requireStaffOrAdmin } from "@/lib/auth/dal";
+import { createNotification } from "@/lib/notifications/create";
 import type { HandoverPhotoType, HandoverType } from "@/lib/supabase/types";
 
 const handoverSchema = z.object({
@@ -26,7 +27,7 @@ export async function submitHandover(
   _state: HandoverFormState,
   formData: FormData
 ): Promise<HandoverFormState> {
-  const admin = await requireAdmin();
+  const admin = await requireStaffOrAdmin();
   const supabase = await createClient();
 
   const { data: reservation, error: reservationError } = await supabase
@@ -37,8 +38,8 @@ export async function submitHandover(
   if (reservationError || !reservation) {
     return { error: "Reservation not found." };
   }
-  if (type === "delivery" && reservation.status !== "approved") {
-    return { error: "This reservation must be approved before recording delivery." };
+  if (type === "delivery" && reservation.status !== "confirmed") {
+    return { error: "This reservation must be confirmed before recording delivery." };
   }
   if (type === "return" && reservation.status !== "delivered") {
     return { error: "The car must be delivered before its return can be recorded." };
@@ -126,6 +127,14 @@ export async function submitHandover(
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Could not save the inspection. Please try again." };
   }
+
+  await createNotification({
+    recipientRole: "admin",
+    type: type === "delivery" ? "handover_delivered" : "handover_returned",
+    reservationId,
+    message: type === "delivery" ? "A car was delivered to a customer." : "A car was returned by a customer.",
+    link: "/admin/reservations",
+  });
 
   revalidatePath("/", "layout");
 }

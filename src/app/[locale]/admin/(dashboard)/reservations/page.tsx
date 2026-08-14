@@ -4,22 +4,31 @@ import { getAllReservationsForAdmin } from "@/lib/reservations";
 import { getSignedDocUrl } from "@/lib/customers/documents";
 import { getHandoversForReservation } from "@/lib/handovers";
 import { resolveHandoverForDisplay } from "@/lib/handovers/photos";
+import { hasSubmittedDocuments } from "@/lib/auth/customer-dal";
+import { requireAdmin } from "@/lib/auth/dal";
+import { getChargesForReservation } from "@/lib/reservations/charges";
 import HandoverSummary from "@/components/HandoverSummary";
+import ChargesList from "@/components/ChargesList";
+import AddChargeForm from "@/components/admin/AddChargeForm";
 import ReservationActions from "./ReservationActions";
+import ReservationConfirmPanel from "./ReservationConfirmPanel";
+import CancelReservationButton from "./CancelReservationButton";
 import HandoverForm from "./HandoverForm";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
   approved: "bg-brand/10 text-brand",
+  confirmed: "bg-brand/10 text-brand",
   rejected: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400",
   cancelled: "bg-muted text-foreground/60",
   delivered: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
   completed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
 };
 
-const HANDOVER_STATUSES = new Set(["approved", "delivered", "completed"]);
+const HANDOVER_STATUSES = new Set(["confirmed", "delivered", "completed"]);
 
 export default async function AdminReservationsPage() {
+  await requireAdmin();
   const [t, tStatus, reservations] = await Promise.all([
     getTranslations("AdminReservations"),
     getTranslations("ReservationStatus"),
@@ -38,8 +47,10 @@ export default async function AdminReservationsPage() {
           back: await getSignedDocUrl(r.customers?.national_id_back_url ?? null),
           license: await getSignedDocUrl(r.customers?.driving_license_url ?? null),
         },
+        docsComplete: r.customers ? hasSubmittedDocuments(r.customers) : false,
         delivery: handovers.find((h) => h.type === "delivery") ?? null,
         return: handovers.find((h) => h.type === "return") ?? null,
+        charges: r.status === "completed" ? await getChargesForReservation(r.id) : [],
       };
     })
   );
@@ -96,13 +107,26 @@ export default async function AdminReservationsPage() {
 
             {r.status === "pending" && <ReservationActions reservationId={r.id} />}
 
+            {r.status === "approved" && (
+              <ReservationConfirmPanel
+                reservationId={r.id}
+                docsComplete={r.docsComplete}
+                amountPaid={r.amount_paid}
+              />
+            )}
+
             {r.delivery && (
               <div className="mt-4 border-t border-border pt-4">
                 <HandoverSummary handover={r.delivery} />
               </div>
             )}
-            {r.status === "approved" && !r.delivery && (
-              <HandoverForm reservationId={r.id} type="delivery" />
+            {r.status === "confirmed" && !r.delivery && (
+              <>
+                <div className="mt-4 flex justify-end">
+                  <CancelReservationButton reservationId={r.id} />
+                </div>
+                <HandoverForm reservationId={r.id} type="delivery" />
+              </>
             )}
 
             {r.return && (
@@ -112,6 +136,13 @@ export default async function AdminReservationsPage() {
             )}
             {r.status === "delivered" && !r.return && (
               <HandoverForm reservationId={r.id} type="return" />
+            )}
+
+            {r.status === "completed" && (
+              <>
+                <ChargesList charges={r.charges} />
+                <AddChargeForm reservationId={r.id} />
+              </>
             )}
           </div>
         ))}

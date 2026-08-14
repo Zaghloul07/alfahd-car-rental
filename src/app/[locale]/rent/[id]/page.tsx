@@ -6,15 +6,19 @@ import Footer from "@/components/Footer";
 import ReservationPanel from "@/components/ReservationPanel";
 import { getCarById } from "@/lib/cars";
 import { formatEGP, formatKm } from "@/lib/format";
-import { getCurrentCustomer, hasSubmittedDocuments } from "@/lib/auth/customer-dal";
+import { getCurrentCustomer } from "@/lib/auth/customer-dal";
 import { createReservation } from "@/lib/reservations/actions";
+import { getUnavailableDateRanges } from "@/lib/reservations/availability";
 
 export default async function RentDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ start?: string; end?: string }>;
 }) {
   const { id } = await params;
+  const { start, end } = await searchParams;
   const [t, car, customer] = await Promise.all([
     getTranslations("CarDetail"),
     getCarById(id),
@@ -23,15 +27,21 @@ export default async function RentDetailPage({
 
   if (!car || car.listing_type !== "rent") notFound();
 
+  const blockedRanges = await getUnavailableDateRanges(car.id);
+
   const whatsappMessage = encodeURIComponent(
     `Hi, I'd like to rent the ${car.title} (${car.location}).`
   );
 
   const reservationProps = !customer
-    ? ({ status: "signed_out", nextPath: `/rent/${car.id}` } as const)
-    : !hasSubmittedDocuments(customer)
-      ? ({ status: "needs_documents" } as const)
-      : ({ status: "ready", action: createReservation.bind(null, car.id) } as const);
+    ? ({ status: "signed_out", nextPath: `/rent/${car.id}`, blockedRanges } as const)
+    : ({
+        status: "ready",
+        action: createReservation.bind(null, car.id),
+        blockedRanges,
+        defaultStart: start,
+        defaultEnd: end,
+      } as const);
 
   return (
     <>

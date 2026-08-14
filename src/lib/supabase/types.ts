@@ -36,6 +36,7 @@ export type ProfileRow = {
   id: string;
   email: string;
   is_admin: boolean;
+  role: "admin" | "staff" | null;
   created_at: string;
 };
 
@@ -53,6 +54,7 @@ export type CustomerRow = {
 export type ReservationStatus =
   | "pending"
   | "approved"
+  | "confirmed"
   | "rejected"
   | "cancelled"
   | "delivered"
@@ -69,6 +71,12 @@ export type ReservationRow = {
   created_at: string;
   reviewed_at: string | null;
   reviewed_by: string | null;
+  amount_due: number | null;
+  amount_paid: number;
+  paid_at: string | null;
+  paid_by: string | null;
+  confirmed_at: string | null;
+  confirmed_by: string | null;
 };
 
 export type HandoverType = "delivery" | "return";
@@ -92,6 +100,38 @@ export type HandoverPhotoRow = {
   handover_id: string;
   photo_type: HandoverPhotoType;
   storage_path: string;
+  created_at: string;
+};
+
+export type NotificationType =
+  | "reservation_created"
+  | "reservation_approved"
+  | "reservation_rejected"
+  | "reservation_cancelled"
+  | "documents_submitted"
+  | "payment_marked_paid"
+  | "reservation_confirmed"
+  | "handover_delivered"
+  | "handover_returned"
+  | "fine_added";
+
+export type NotificationRow = {
+  id: string;
+  recipient_role: "admin" | "staff";
+  type: NotificationType;
+  reservation_id: string | null;
+  message: string;
+  link: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+export type ReservationChargeRow = {
+  id: string;
+  reservation_id: string;
+  amount: number;
+  reason: string;
+  created_by: string;
   created_at: string;
 };
 
@@ -153,8 +193,40 @@ export type Database = {
         Update: Partial<HandoverPhotoRow>;
         Relationships: [];
       };
+      notifications: {
+        Row: NotificationRow;
+        Insert: Partial<NotificationRow> & { recipient_role: "admin" | "staff"; type: NotificationType; message: string };
+        Update: Partial<NotificationRow>;
+        Relationships: [];
+      };
+      reservation_charges: {
+        Row: ReservationChargeRow;
+        Insert: Partial<ReservationChargeRow> & {
+          reservation_id: string;
+          amount: number;
+          reason: string;
+          created_by: string;
+        };
+        Update: Partial<ReservationChargeRow>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_car_availability: {
+        Args: Record<string, never>;
+        Returns: { reservation_id: string; car_id: string; start_date: string; end_date: string }[];
+      };
+      create_notification: {
+        Args: {
+          p_recipient_role: string;
+          p_type: string;
+          p_reservation_id: string | null;
+          p_message: string;
+          p_link: string | null;
+        };
+        Returns: undefined;
+      };
+    };
   };
 };

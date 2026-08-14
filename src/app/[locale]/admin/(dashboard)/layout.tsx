@@ -1,19 +1,23 @@
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { requireAdmin } from "@/lib/auth/dal";
+import { requireStaffOrAdmin } from "@/lib/auth/dal";
 import { logout } from "@/lib/auth/actions";
+import { getUnreadCount } from "@/lib/notifications/queries";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Logo from "@/components/Logo";
+import NotificationBell from "@/components/admin/NotificationBell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const [admin, t, cookieStore] = await Promise.all([
-    requireAdmin(),
+    requireStaffOrAdmin(),
     getTranslations("AdminNav"),
     cookies(),
   ]);
   const isDark = cookieStore.get("theme")?.value === "dark";
+  const isFullAdmin = admin.is_admin;
+  const unreadCount = await getUnreadCount(admin);
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,14 +28,30 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="hidden text-lg font-bold text-brand sm:inline">{t("brand")}</span>
           </Link>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:gap-x-4 sm:text-sm">
-            <Link href="/admin" className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand">
-              {t("cars")}
-            </Link>
+            {isFullAdmin && (
+              <>
+                <Link href="/admin" className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand">
+                  {t("cars")}
+                </Link>
+                <Link
+                  href="/admin/reservations"
+                  className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
+                >
+                  {t("reservations")}
+                </Link>
+                <Link
+                  href="/admin/reports"
+                  className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
+                >
+                  {t("reports")}
+                </Link>
+              </>
+            )}
             <Link
-              href="/admin/reservations"
+              href="/admin/handovers"
               className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
             >
-              {t("reservations")}
+              {t("handovers")}
             </Link>
             <Link href="/" className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand">
               {t("viewSite")}
@@ -42,6 +62,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 {t("signOut")}
               </button>
             </form>
+            <NotificationBell initialCount={unreadCount} />
             <LanguageSwitcher />
             <ThemeToggle initialIsDark={isDark} />
           </div>

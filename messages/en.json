@@ -26,7 +26,10 @@
     "title": "Rent a Car",
     "subtitle": "Short-term or long-term, pick the car that fits your trip.",
     "allMakes": "All makes",
-    "noCars": "No cars available right now — check back soon."
+    "noCars": "No cars available right now — check back soon.",
+    "from": "From",
+    "to": "To",
+    "checkAvailability": "Check availability"
   },
   "Buy": {
     "title": "Buy a Car",
@@ -57,13 +60,12 @@
     "installments": "Installments available"
   },
   "Reservation": {
-    "signedOutTitle": "Sign in to reserve this car",
-    "signedOutSubtitle": "Creating an account takes about 2 minutes.",
-    "signUp": "Sign Up",
+    "checkAvailabilityTitle": "Check availability & reserve",
+    "checkAvailabilitySubtitle": "Pick your dates, then sign up to send a reservation request.",
+    "signUpToReserve": "Sign Up to Reserve",
     "signIn": "Sign In",
-    "needsDocsTitle": "Complete your verification to reserve",
-    "needsDocsSubtitle": "We need your national ID and driving license before submitting a reservation request.",
-    "uploadDocuments": "Upload Documents",
+    "unavailableDates": "Unavailable",
+    "datesUnavailable": "These dates are not available for this car.",
     "formTitle": "Reserve this car",
     "formSubtitle": "This sends a request to the team — they'll confirm before it's final.",
     "from": "From",
@@ -99,8 +101,8 @@
     "name": "Name",
     "mobileNumber": "Mobile number",
     "verificationDocs": "Verification documents",
-    "docsCompleteDesc": "Submitted — required before a reservation can be approved.",
-    "docsIncompleteDesc": "Upload your national ID and driving license to be able to reserve a car.",
+    "docsCompleteDesc": "Submitted — required before your reservation can be confirmed.",
+    "docsIncompleteDesc": "Upload your national ID and driving license once your reservation is approved.",
     "complete": "Complete",
     "incomplete": "Incomplete",
     "updateDocuments": "Update documents",
@@ -111,7 +113,9 @@
     "browseCars": "Browse cars to rent",
     "datesNotSpecified": "Dates not specified",
     "carGone": "Car no longer listed",
-    "perDay": "/ day"
+    "perDay": "/ day",
+    "approvedNeedsDocs": "Your reservation was approved! Upload your documents to continue:",
+    "approvedAwaitingPayment": "Your documents are on file — pay the full amount to get your reservation confirmed."
   },
   "Documents": {
     "title": "Verification documents",
@@ -126,6 +130,7 @@
   "ReservationStatus": {
     "pending": "pending",
     "approved": "approved",
+    "confirmed": "confirmed",
     "rejected": "rejected",
     "cancelled": "cancelled",
     "delivered": "car delivered",
@@ -143,6 +148,8 @@
     "brand": "AlFahd Admin",
     "cars": "Cars",
     "reservations": "Reservations",
+    "handovers": "Handovers",
+    "reports": "Reports",
     "viewSite": "View Site",
     "signOut": "Sign out"
   },
@@ -219,7 +226,58 @@
     "none": "none",
     "view": "View",
     "approve": "Approve",
-    "reject": "Reject"
+    "reject": "Reject",
+    "docsComplete": "Documents complete",
+    "awaitingDocuments": "Awaiting documents",
+    "paid": "Paid",
+    "awaitingPayment": "Awaiting payment",
+    "amountPaid": "Amount paid (EGP)",
+    "markPaid": "Mark as Paid",
+    "confirmReservation": "Confirm Reservation",
+    "cancel": "Cancel",
+    "saving": "Saving…"
+  },
+  "Notifications": {
+    "bell": "Notifications",
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "loading": "Loading…",
+    "empty": "No notifications yet."
+  },
+  "AdminReports": {
+    "title": "Reports",
+    "overview": "Overview",
+    "byCar": "By Car",
+    "byCustomer": "By Customer",
+    "activeReservations": "Active reservations",
+    "pendingApprovals": "Pending approvals",
+    "upcomingDeliveries": "Ready for delivery",
+    "revenueThisMonth": "Revenue this month",
+    "reservationsByStatus": "Reservations by status",
+    "revenueByMonth": "Revenue by month",
+    "car": "Car",
+    "customer": "Customer",
+    "mobileNumber": "Mobile number",
+    "reservations": "Reservations",
+    "revenue": "Revenue",
+    "totalPaid": "Total paid",
+    "fines": "Fines",
+    "noData": "No data yet."
+  },
+  "AdminHandovers": {
+    "title": "Deliveries & Returns",
+    "noReservations": "No reservations awaiting delivery or return.",
+    "carGone": "Car no longer listed",
+    "unknownCustomer": "Unknown customer"
+  },
+  "Charges": {
+    "chargesTitle": "Charges",
+    "total": "Total",
+    "addChargeTitle": "Add a charge (damage, late return, etc.)",
+    "amount": "Amount (EGP)",
+    "reason": "Reason",
+    "addCharge": "Add Charge",
+    "saving": "Saving…"
   },
   "Handover": {
     "deliveryFormTitle": "Vehicle delivery inspection",

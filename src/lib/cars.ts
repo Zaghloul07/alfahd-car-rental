@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { CarRow, ListingType } from "@/lib/supabase/types";
+import { getBlockedCarIds } from "@/lib/reservations/availability";
 
 export interface CarFilters {
   make?: string;
@@ -7,6 +8,8 @@ export interface CarFilters {
   maxPrice?: number;
   minYear?: number;
   maxYear?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 export async function getPublishedCars(
@@ -28,6 +31,13 @@ export async function getPublishedCars(
   if (filters.maxYear) query = query.lte("year", filters.maxYear);
   if (filters.minPrice) query = query.gte(priceColumn, filters.minPrice);
   if (filters.maxPrice) query = query.lte(priceColumn, filters.maxPrice);
+
+  if (filters.startDate && filters.endDate) {
+    const blockedIds = await getBlockedCarIds(filters.startDate, filters.endDate);
+    if (blockedIds.length > 0) {
+      query = query.not("id", "in", `(${blockedIds.join(",")})`);
+    }
+  }
 
   const { data, error } = await query;
   if (error) throw error;

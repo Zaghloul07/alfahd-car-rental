@@ -5,6 +5,7 @@ import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireCustomer } from "@/lib/auth/customer-dal";
+import { createNotification } from "@/lib/notifications/create";
 
 export type DocumentsFormState = { error?: string } | undefined;
 
@@ -56,6 +57,15 @@ export async function uploadDocuments(
       .eq("id", customer.id);
 
     if (error) throw error;
+
+    if (willBeComplete && !customer.documents_submitted_at) {
+      await createNotification({
+        recipientRole: "admin",
+        type: "documents_submitted",
+        message: `${customer.name} uploaded their verification documents.`,
+        link: "/admin/reservations",
+      });
+    }
   } catch {
     return { error: "Could not upload your documents. Please try again." };
   }

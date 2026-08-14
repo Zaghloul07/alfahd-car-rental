@@ -26,7 +26,10 @@
     "title": "استئجار سيارة",
     "subtitle": "قصير أو طويل المدى، اختار السيارة اللي تناسب رحلتك.",
     "allMakes": "كل الماركات",
-    "noCars": "لا توجد سيارات متاحة حاليًا — تابعنا قريبًا."
+    "noCars": "لا توجد سيارات متاحة حاليًا — تابعنا قريبًا.",
+    "from": "من",
+    "to": "إلى",
+    "checkAvailability": "تحقق من التوفر"
   },
   "Buy": {
     "title": "شراء سيارة",
@@ -57,13 +60,12 @@
     "installments": "التقسيط متاح"
   },
   "Reservation": {
-    "signedOutTitle": "سجّل دخولك لحجز السيارة",
-    "signedOutSubtitle": "إنشاء الحساب بياخد حوالي دقيقتين.",
-    "signUp": "إنشاء حساب",
+    "checkAvailabilityTitle": "تحقق من التوفر واحجز",
+    "checkAvailabilitySubtitle": "اختار تواريخك، وبعدين سجّل حساب عشان تبعت طلب الحجز.",
+    "signUpToReserve": "إنشاء حساب للحجز",
     "signIn": "تسجيل الدخول",
-    "needsDocsTitle": "أكمل بيانات التحقق للحجز",
-    "needsDocsSubtitle": "محتاجين صورة البطاقة الشخصية ورخصة القيادة قبل إرسال طلب الحجز.",
-    "uploadDocuments": "رفع المستندات",
+    "unavailableDates": "غير متاح",
+    "datesUnavailable": "هذه التواريخ غير متاحة لهذه السيارة.",
     "formTitle": "احجز هذه السيارة",
     "formSubtitle": "هيتم إرسال طلبك للفريق، وهيتأكد الحجز بعد الموافقة.",
     "from": "من",
@@ -99,8 +101,8 @@
     "name": "الاسم",
     "mobileNumber": "رقم الموبايل",
     "verificationDocs": "مستندات التحقق",
-    "docsCompleteDesc": "تم الإرسال — مطلوبة قبل الموافقة على الحجز.",
-    "docsIncompleteDesc": "ارفع صورة البطاقة الشخصية ورخصة القيادة عشان تقدر تحجز سيارة.",
+    "docsCompleteDesc": "تم الإرسال — مطلوبة قبل تأكيد الحجز.",
+    "docsIncompleteDesc": "ارفع صورة البطاقة الشخصية ورخصة القيادة بعد الموافقة على حجزك.",
     "complete": "مكتملة",
     "incomplete": "غير مكتملة",
     "updateDocuments": "تحديث المستندات",
@@ -111,7 +113,9 @@
     "browseCars": "تصفح السيارات المتاحة للإيجار",
     "datesNotSpecified": "التواريخ غير محددة",
     "carGone": "السيارة لم تعد مدرجة",
-    "perDay": "/ يوم"
+    "perDay": "/ يوم",
+    "approvedNeedsDocs": "تمت الموافقة على حجزك! ارفع مستنداتك للمتابعة:",
+    "approvedAwaitingPayment": "مستنداتك مسجلة — ادفع المبلغ كاملاً عشان يتأكد حجزك."
   },
   "Documents": {
     "title": "مستندات التحقق",
@@ -126,6 +130,7 @@
   "ReservationStatus": {
     "pending": "قيد المراجعة",
     "approved": "تمت الموافقة",
+    "confirmed": "تم التأكيد",
     "rejected": "مرفوض",
     "cancelled": "ملغي",
     "delivered": "تم تسليم السيارة",
@@ -143,6 +148,8 @@
     "brand": "إدارة الفهد",
     "cars": "السيارات",
     "reservations": "الحجوزات",
+    "handovers": "التسليم والاستلام",
+    "reports": "التقارير",
     "viewSite": "عرض الموقع",
     "signOut": "تسجيل الخروج"
   },
@@ -219,7 +226,58 @@
     "none": "غير متاح",
     "view": "عرض",
     "approve": "موافقة",
-    "reject": "رفض"
+    "reject": "رفض",
+    "docsComplete": "المستندات مكتملة",
+    "awaitingDocuments": "بانتظار المستندات",
+    "paid": "مدفوع",
+    "awaitingPayment": "بانتظار الدفع",
+    "amountPaid": "المبلغ المدفوع (جنيه)",
+    "markPaid": "تسجيل الدفع",
+    "confirmReservation": "تأكيد الحجز",
+    "cancel": "إلغاء",
+    "saving": "جارٍ الحفظ…"
+  },
+  "Notifications": {
+    "bell": "الإشعارات",
+    "title": "الإشعارات",
+    "markAllRead": "تعليم الكل كمقروء",
+    "loading": "جارٍ التحميل…",
+    "empty": "لا توجد إشعارات حتى الآن."
+  },
+  "AdminReports": {
+    "title": "التقارير",
+    "overview": "نظرة عامة",
+    "byCar": "حسب السيارة",
+    "byCustomer": "حسب العميل",
+    "activeReservations": "الحجوزات النشطة",
+    "pendingApprovals": "بانتظار الموافقة",
+    "upcomingDeliveries": "جاهزة للتسليم",
+    "revenueThisMonth": "إيرادات هذا الشهر",
+    "reservationsByStatus": "الحجوزات حسب الحالة",
+    "revenueByMonth": "الإيرادات حسب الشهر",
+    "car": "السيارة",
+    "customer": "العميل",
+    "mobileNumber": "رقم الموبايل",
+    "reservations": "الحجوزات",
+    "revenue": "الإيرادات",
+    "totalPaid": "إجمالي المدفوع",
+    "fines": "الغرامات",
+    "noData": "لا توجد بيانات بعد."
+  },
+  "AdminHandovers": {
+    "title": "التسليم والاستلام",
+    "noReservations": "لا توجد حجوزات بانتظار التسليم أو الاستلام.",
+    "carGone": "السيارة لم تعد مدرجة",
+    "unknownCustomer": "عميل غير معروف"
+  },
+  "Charges": {
+    "chargesTitle": "الغرامات",
+    "total": "الإجمالي",
+    "addChargeTitle": "إضافة غرامة (ضرر، تأخير في الإرجاع، إلخ)",
+    "amount": "المبلغ (جنيه)",
+    "reason": "السبب",
+    "addCharge": "إضافة غرامة",
+    "saving": "جارٍ الحفظ…"
   },
   "Handover": {
     "deliveryFormTitle": "معاينة تسليم السيارة",

@@ -8,12 +8,12 @@ import { getAvailableMakes, getPublishedCars } from "@/lib/cars";
 export default async function RentPage({
   searchParams,
 }: {
-  searchParams: Promise<{ make?: string }>;
+  searchParams: Promise<{ make?: string; start?: string; end?: string }>;
 }) {
-  const { make } = await searchParams;
+  const { make, start, end } = await searchParams;
   const [t, cars, makes] = await Promise.all([
     getTranslations("Rent"),
-    getPublishedCars("rent", { make }),
+    getPublishedCars("rent", { make, startDate: start, endDate: end }),
     getAvailableMakes("rent"),
   ]);
 
@@ -29,6 +29,34 @@ export default async function RentPage({
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-10">
+          <form method="get" className="mb-6 flex flex-wrap items-end gap-3">
+            {make && <input type="hidden" name="make" value={make} />}
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-foreground/70">{t("from")}</span>
+              <input
+                type="date"
+                name="start"
+                defaultValue={start}
+                className="rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-brand"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-foreground/70">{t("to")}</span>
+              <input
+                type="date"
+                name="end"
+                defaultValue={end}
+                className="rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-brand"
+              />
+            </label>
+            <button
+              type="submit"
+              className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
+            >
+              {t("checkAvailability")}
+            </button>
+          </form>
+
           <div className="mb-6 flex flex-wrap items-center gap-2">
             <Link
               href="/rent"

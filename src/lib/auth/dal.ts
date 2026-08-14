@@ -33,3 +33,31 @@ export async function requireAdmin() {
   // (no react-server export condition), so narrow explicitly.
   throw new Error("unreachable");
 }
+
+export const getCurrentStaff = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, email, is_admin, role, created_at")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile || (!profile.is_admin && profile.role !== "staff")) return null;
+
+  return profile;
+});
+
+export async function requireStaffOrAdmin() {
+  const profile = await getCurrentStaff();
+  if (profile) return profile;
+
+  const locale = await getLocale();
+  redirect({ href: "/admin/login", locale });
+  throw new Error("unreachable");
+}
