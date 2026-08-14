@@ -27,6 +27,18 @@ export default function HandoverForm({
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
+        {type === "return" && (
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium">{t("returnDate")}</span>
+            <input
+              name="return_date"
+              type="date"
+              required
+              defaultValue={new Date().toISOString().slice(0, 10)}
+              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-brand"
+            />
+          </label>
+        )}
         <label className="block">
           <span className="mb-1 block text-sm font-medium">{t("odometer")}</span>
           <input

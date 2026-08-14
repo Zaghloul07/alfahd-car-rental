@@ -11,6 +11,7 @@ const handoverSchema = z.object({
   odometer_km: z.coerce.number().int().min(0),
   fuel_level: z.enum(["empty", "quarter", "half", "three_quarter", "full"]),
   notes: z.string().optional(),
+  return_date: z.string().optional(),
 });
 
 export type HandoverFormState = { error?: string } | undefined;
@@ -59,6 +60,9 @@ export async function submitHandover(
     fields = handoverSchema.parse(Object.fromEntries(formData.entries()));
   } catch {
     return { error: "Enter a valid odometer reading and fuel level." };
+  }
+  if (type === "return" && !fields.return_date) {
+    return { error: "Enter the date the car was returned." };
   }
 
   const signatureDataUrl = String(formData.get("signature_data_url") ?? "");
@@ -109,6 +113,7 @@ export async function submitHandover(
       odometer_km: fields.odometer_km,
       fuel_level: fields.fuel_level,
       notes: fields.notes?.trim() || null,
+      return_date: type === "return" ? fields.return_date : null,
       signature_path: `${handoverId}/signature.png`,
       created_by: admin.id,
     });

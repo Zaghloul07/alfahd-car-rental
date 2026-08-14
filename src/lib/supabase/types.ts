@@ -90,6 +90,7 @@ export type HandoverReportRow = {
   odometer_km: number;
   fuel_level: FuelLevel;
   notes: string | null;
+  return_date: string | null;
   signature_path: string;
   created_by: string;
   created_at: string;

@@ -110,11 +110,16 @@ export default async function AdminReservationsPage() {
             {r.status === "pending" && <ReservationActions reservationId={r.id} />}
 
             {r.status === "approved" && (
-              <ReservationConfirmPanel
-                reservationId={r.id}
-                docsComplete={r.docsComplete}
-                amountPaid={r.amount_paid}
-              />
+              <>
+                <ReservationConfirmPanel
+                  reservationId={r.id}
+                  docsComplete={r.docsComplete}
+                  amountPaid={r.amount_paid}
+                />
+                <div className="mt-4 flex justify-end">
+                  <CancelReservationButton reservationId={r.id} />
+                </div>
+              </>
             )}
 
             {r.delivery && (
@@ -133,7 +138,14 @@ export default async function AdminReservationsPage() {
 
             {r.return && (
               <div className="mt-4 border-t border-border pt-4">
-                <HandoverSummary handover={r.return} />
+                <HandoverSummary
+                  handover={r.return}
+                  period={
+                    r.start_date && r.end_date && r.cars?.daily_price != null
+                      ? { startDate: r.start_date, endDate: r.end_date, dailyPrice: r.cars.daily_price }
+                      : undefined
+                  }
+                />
               </div>
             )}
             {r.status === "delivered" && !r.return && (

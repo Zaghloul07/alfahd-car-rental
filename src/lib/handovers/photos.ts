@@ -20,6 +20,7 @@ export type ResolvedHandover = {
   odometer_km: number;
   fuel_level: FuelLevel;
   notes: string | null;
+  return_date: string | null;
   created_at: string;
   signatureUrl: string | null;
   photos: { photo_type: HandoverPhotoType; url: string | null }[];
@@ -41,6 +42,7 @@ export async function resolveHandoverForDisplay(handover: HandoverWithPhotos): P
     odometer_km: handover.odometer_km,
     fuel_level: handover.fuel_level,
     notes: handover.notes,
+    return_date: handover.return_date,
     created_at: handover.created_at,
     signatureUrl,
     photos,

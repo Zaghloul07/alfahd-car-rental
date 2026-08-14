@@ -6,7 +6,7 @@ export async function getReservationsForHandoverQueue(): Promise<ReservationWith
   const { data, error } = await supabase
     .from("reservations")
     .select(
-      "*, cars(id, title, images), customers(id, name, phone, national_id_front_url, national_id_back_url, driving_license_url)"
+      "*, cars(id, title, images, daily_price), customers(id, name, phone, national_id_front_url, national_id_back_url, driving_license_url)"
     )
     .in("status", ["confirmed", "delivered"])
     .order("created_at", { ascending: false });

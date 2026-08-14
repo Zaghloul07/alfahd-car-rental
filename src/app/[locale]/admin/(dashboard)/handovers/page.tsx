@@ -75,7 +75,14 @@ export default async function AdminHandoversPage() {
 
             {r.return && (
               <div className="mt-4 border-t border-border pt-4">
-                <HandoverSummary handover={r.return} />
+                <HandoverSummary
+                  handover={r.return}
+                  period={
+                    r.start_date && r.end_date && r.cars?.daily_price != null
+                      ? { startDate: r.start_date, endDate: r.end_date, dailyPrice: r.cars.daily_price }
+                      : undefined
+                  }
+                />
               </div>
             )}
             {r.status === "delivered" && !r.return && (
