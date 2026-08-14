@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import type { ReservationRow, CustomerRow, CarRow, ReservationChargeRow } from "@/lib/supabase/types";
 
 export type OverviewStats = {
   activeReservations: number;
@@ -167,4 +168,36 @@ export async function getCustomerReport(): Promise<CustomerReportRow[]> {
       };
     })
     .sort((a, b) => b.totalPaid - a.totalPaid);
+}
+
+export type CarReservationRow = ReservationRow & {
+  customers: Pick<CustomerRow, "id" | "name" | "phone"> | null;
+  reservation_charges: Pick<ReservationChargeRow, "id" | "amount" | "reason" | "created_at">[];
+};
+
+export async function getReservationsForCar(carId: string): Promise<CarReservationRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("*, customers(id, name, phone), reservation_charges(id, amount, reason, created_at)")
+    .eq("car_id", carId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as CarReservationRow[];
+}
+
+export type CustomerReservationRow = ReservationRow & {
+  cars: Pick<CarRow, "id" | "title" | "images"> | null;
+  reservation_charges: Pick<ReservationChargeRow, "id" | "amount" | "reason" | "created_at">[];
+};
+
+export async function getReservationsForCustomer(customerId: string): Promise<CustomerReservationRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("*, cars(id, title, images), reservation_charges(id, amount, reason, created_at)")
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as CustomerReservationRow[];
 }

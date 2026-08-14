@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import {
   getUnreadNotificationCount,
   getRecentNotificationsAction,
@@ -99,16 +100,19 @@ export default function NotificationBell({ initialCount }: { initialCount: numbe
                     n.read_at ? "text-foreground/50" : "bg-brand/5 font-medium"
                   }`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => !n.read_at && handleMarkOne(n.id)}
+                  <Link
+                    href={n.link ?? "/admin/reservations"}
+                    onClick={() => {
+                      setOpen(false);
+                      if (!n.read_at) handleMarkOne(n.id);
+                    }}
                     className="block w-full text-start"
                   >
                     {n.message}
                     <span className="mt-0.5 block text-[10px] text-foreground/40">
                       {new Date(n.created_at).toLocaleString()}
                     </span>
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -54,7 +54,7 @@ export async function addReservationCharge(
     type: "fine_added",
     reservationId,
     message: `A charge of ${fields.amount} EGP was added to a completed reservation.`,
-    link: "/admin/reservations",
+    link: `/admin/reservations#reservation-${reservationId}`,
   });
 
   revalidatePath("/", "layout");

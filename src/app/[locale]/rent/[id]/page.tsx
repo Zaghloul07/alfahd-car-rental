@@ -34,7 +34,13 @@ export default async function RentDetailPage({
   );
 
   const reservationProps = !customer
-    ? ({ status: "signed_out", nextPath: `/rent/${car.id}`, blockedRanges } as const)
+    ? ({
+        status: "signed_out",
+        nextPath: `/rent/${car.id}`,
+        blockedRanges,
+        defaultStart: start,
+        defaultEnd: end,
+      } as const)
     : ({
         status: "ready",
         action: createReservation.bind(null, car.id),

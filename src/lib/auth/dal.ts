@@ -34,7 +34,7 @@ export async function requireAdmin() {
   throw new Error("unreachable");
 }
 
-export const getCurrentStaff = cache(async () => {
+export const getCurrentInspectorOrAdmin = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -48,13 +48,13 @@ export const getCurrentStaff = cache(async () => {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile || (!profile.is_admin && profile.role !== "staff")) return null;
+  if (!profile || (!profile.is_admin && profile.role !== "inspector")) return null;
 
   return profile;
 });
 
-export async function requireStaffOrAdmin() {
-  const profile = await getCurrentStaff();
+export async function requireInspectorOrAdmin() {
+  const profile = await getCurrentInspectorOrAdmin();
   if (profile) return profile;
 
   const locale = await getLocale();

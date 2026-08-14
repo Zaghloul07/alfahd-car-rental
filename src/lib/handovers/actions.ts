@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { requireStaffOrAdmin } from "@/lib/auth/dal";
+import { requireInspectorOrAdmin } from "@/lib/auth/dal";
 import { createNotification } from "@/lib/notifications/create";
 import type { HandoverPhotoType, HandoverType } from "@/lib/supabase/types";
 
@@ -27,7 +27,7 @@ export async function submitHandover(
   _state: HandoverFormState,
   formData: FormData
 ): Promise<HandoverFormState> {
-  const admin = await requireStaffOrAdmin();
+  const admin = await requireInspectorOrAdmin();
   const supabase = await createClient();
 
   const { data: reservation, error: reservationError } = await supabase
@@ -133,7 +133,7 @@ export async function submitHandover(
     type: type === "delivery" ? "handover_delivered" : "handover_returned",
     reservationId,
     message: type === "delivery" ? "A car was delivered to a customer." : "A car was returned by a customer.",
-    link: "/admin/reservations",
+    link: `/admin/reservations#reservation-${reservationId}`,
   });
 
   revalidatePath("/", "layout");

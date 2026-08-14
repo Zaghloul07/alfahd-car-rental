@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type { NotificationRow } from "@/lib/supabase/types";
 
-type Recipient = { is_admin: boolean; role: "admin" | "staff" | null };
+type Recipient = { is_admin: boolean; role: "admin" | "inspector" | null };
 
 export async function getUnreadCount(profile: Recipient): Promise<number> {
   const supabase = await createClient();
@@ -10,7 +10,7 @@ export async function getUnreadCount(profile: Recipient): Promise<number> {
     .from("notifications")
     .select("id", { count: "exact", head: true })
     .is("read_at", null);
-  if (!profile.is_admin) query = query.eq("recipient_role", profile.role ?? "staff");
+  if (!profile.is_admin) query = query.eq("recipient_role", profile.role ?? "inspector");
 
   const { count, error } = await query;
   if (error) throw error;
@@ -24,7 +24,7 @@ export async function getRecentNotifications(profile: Recipient, limit = 20): Pr
     .select("*")
     .order("created_at", { ascending: false })
     .limit(limit);
-  if (!profile.is_admin) query = query.eq("recipient_role", profile.role ?? "staff");
+  if (!profile.is_admin) query = query.eq("recipient_role", profile.role ?? "inspector");
 
   const { data, error } = await query;
   if (error) throw error;

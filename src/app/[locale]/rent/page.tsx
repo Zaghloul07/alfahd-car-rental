@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarCard from "@/components/CarCard";
 import { getAvailableMakes, getPublishedCars } from "@/lib/cars";
+import { getBlockedCarIds } from "@/lib/reservations/availability";
 
 export default async function RentPage({
   searchParams,
@@ -11,11 +12,21 @@ export default async function RentPage({
   searchParams: Promise<{ make?: string; start?: string; end?: string }>;
 }) {
   const { make, start, end } = await searchParams;
-  const [t, cars, makes] = await Promise.all([
-    getTranslations("Rent"),
-    getPublishedCars("rent", { make, startDate: start, endDate: end }),
-    getAvailableMakes("rent"),
-  ]);
+  const hasDates = Boolean(start && end);
+  const dateQuery = hasDates ? `&start=${start}&end=${end}` : "";
+
+  const [t, makes] = await Promise.all([getTranslations("Rent"), getAvailableMakes("rent")]);
+
+  let cars: Awaited<ReturnType<typeof getPublishedCars>> = [];
+  let blockedSet = new Set<string>();
+  if (hasDates) {
+    const [carsResult, blockedIds] = await Promise.all([
+      getPublishedCars("rent", { make }),
+      getBlockedCarIds(start!, end!),
+    ]);
+    cars = carsResult;
+    blockedSet = new Set(blockedIds);
+  }
 
   return (
     <>
@@ -59,7 +70,7 @@ export default async function RentPage({
 
           <div className="mb-6 flex flex-wrap items-center gap-2">
             <Link
-              href="/rent"
+              href={`/rent${hasDates ? `?start=${start}&end=${end}` : ""}`}
               className={`rounded-full border px-4 py-1.5 text-sm ${
                 !make ? "border-brand bg-brand text-white" : "border-border text-foreground/70"
               }`}
@@ -69,7 +80,7 @@ export default async function RentPage({
             {makes.map((m) => (
               <Link
                 key={m}
-                href={`/rent?make=${encodeURIComponent(m)}`}
+                href={`/rent?make=${encodeURIComponent(m)}${dateQuery}`}
                 className={`rounded-full border px-4 py-1.5 text-sm ${
                   make === m
                     ? "border-brand bg-brand text-white"
@@ -81,12 +92,23 @@ export default async function RentPage({
             ))}
           </div>
 
-          {cars.length === 0 ? (
+          {!hasDates ? (
+            <div className="rounded-xl border border-border bg-card p-8 text-center">
+              <p className="font-semibold">{t("pickDatesTitle")}</p>
+              <p className="mt-1 text-sm text-foreground/60">{t("pickDatesPrompt")}</p>
+            </div>
+          ) : cars.length === 0 ? (
             <p className="text-foreground/60">{t("noCars")}</p>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {cars.map((car) => (
-                <CarCard key={car.id} car={car} />
+                <CarCard
+                  key={car.id}
+                  car={car}
+                  unavailable={blockedSet.has(car.id)}
+                  start={start}
+                  end={end}
+                />
               ))}
             </div>
           )}

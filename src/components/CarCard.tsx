@@ -4,16 +4,25 @@ import { Link } from "@/i18n/navigation";
 import type { CarRow } from "@/lib/supabase/types";
 import { formatEGP, formatKm } from "@/lib/format";
 
-export default function CarCard({ car }: { car: CarRow }) {
+export default function CarCard({
+  car,
+  unavailable = false,
+  start,
+  end,
+}: {
+  car: CarRow;
+  unavailable?: boolean;
+  start?: string;
+  end?: string;
+}) {
   const t = useTranslations("CarCard");
-  const href = car.listing_type === "rent" ? `/rent/${car.id}` : `/buy/${car.id}`;
+  const tRent = useTranslations("Rent");
+  const baseHref = car.listing_type === "rent" ? `/rent/${car.id}` : `/buy/${car.id}`;
+  const href = start && end ? `${baseHref}?start=${start}&end=${end}` : baseHref;
   const image = car.images[0] ?? "/cars/sedan-silver.svg";
 
-  return (
-    <Link
-      href={href}
-      className="group block overflow-hidden rounded-xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-    >
+  const inner = (
+    <>
       <div className="relative aspect-[16/10] w-full bg-placeholder">
         <Image
           src={image}
@@ -25,6 +34,11 @@ export default function CarCard({ car }: { car: CarRow }) {
         {car.listing_type === "sale" && car.inspected && (
           <span className="absolute left-2 top-2 rounded-full bg-brand px-2 py-1 text-xs font-medium text-white">
             {t("inspected")}
+          </span>
+        )}
+        {unavailable && (
+          <span className="absolute left-2 top-2 rounded-full bg-foreground/70 px-2 py-1 text-xs font-medium text-white">
+            {tRent("reservedForDates")}
           </span>
         )}
       </div>
@@ -52,6 +66,23 @@ export default function CarCard({ car }: { car: CarRow }) {
           </div>
         )}
       </div>
+    </>
+  );
+
+  if (unavailable) {
+    return (
+      <div className="block cursor-not-allowed overflow-hidden rounded-xl border border-border bg-card opacity-50 grayscale">
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className="group block overflow-hidden rounded-xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    >
+      {inner}
     </Link>
   );
 }

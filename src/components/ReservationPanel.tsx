@@ -13,7 +13,13 @@ type ReserveAction = (
 type DateRange = { start_date: string; end_date: string };
 
 type Props =
-  | { status: "signed_out"; nextPath: string; blockedRanges: DateRange[] }
+  | {
+      status: "signed_out";
+      nextPath: string;
+      blockedRanges: DateRange[];
+      defaultStart?: string;
+      defaultEnd?: string;
+    }
   | {
       status: "ready";
       action: ReserveAction;
@@ -44,8 +50,8 @@ function BlockedRanges({ ranges }: { ranges: DateRange[] }) {
 
 export default function ReservationPanel(props: Props) {
   const t = useTranslations("Reservation");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
+  const [start, setStart] = useState(props.status === "signed_out" ? (props.defaultStart ?? "") : "");
+  const [end, setEnd] = useState(props.status === "signed_out" ? (props.defaultEnd ?? "") : "");
 
   if (props.status === "signed_out") {
     const query = new URLSearchParams();

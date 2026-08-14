@@ -23,11 +23,11 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("is_admin")
+    .select("is_admin, role")
     .eq("id", data.user.id)
     .maybeSingle();
 
-  if (!profile?.is_admin) {
+  if (!profile || (!profile.is_admin && profile.role !== "inspector")) {
     await supabase.auth.signOut();
     return { error: "This account does not have admin access." };
   }

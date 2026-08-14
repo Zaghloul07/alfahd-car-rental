@@ -29,7 +29,10 @@
     "noCars": "No cars available right now — check back soon.",
     "from": "From",
     "to": "To",
-    "checkAvailability": "Check availability"
+    "checkAvailability": "Check availability",
+    "pickDatesTitle": "Pick your dates to see available cars",
+    "pickDatesPrompt": "Choose a start and end date above to browse cars for your trip.",
+    "reservedForDates": "Reserved for these dates"
   },
   "Buy": {
     "title": "Buy a Car",
@@ -150,6 +153,7 @@
     "reservations": "Reservations",
     "handovers": "Handovers",
     "reports": "Reports",
+    "users": "Users",
     "viewSite": "View Site",
     "signOut": "Sign out"
   },
@@ -262,13 +266,32 @@
     "revenue": "Revenue",
     "totalPaid": "Total paid",
     "fines": "Fines",
-    "noData": "No data yet."
+    "noData": "No data yet.",
+    "backToReport": "Back to report",
+    "noReservationsYet": "No reservations yet.",
+    "dates": "Dates",
+    "amountPaid": "Amount paid"
   },
   "AdminHandovers": {
     "title": "Deliveries & Returns",
     "noReservations": "No reservations awaiting delivery or return.",
     "carGone": "Car no longer listed",
     "unknownCustomer": "Unknown customer"
+  },
+  "AdminUsers": {
+    "title": "Team Accounts",
+    "email": "Email",
+    "role": "Role",
+    "created": "Created",
+    "admin": "Admin",
+    "inspector": "Inspector",
+    "addTitle": "Add a team account",
+    "password": "Password",
+    "passwordHint": "At least 8 characters.",
+    "selectRole": "Select role",
+    "create": "Create Account",
+    "creating": "Creating…",
+    "createdSuccess": "Account created."
   },
   "Charges": {
     "chargesTitle": "Charges",

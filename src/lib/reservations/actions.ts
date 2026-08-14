@@ -57,7 +57,7 @@ export async function createReservation(
     type: "reservation_created",
     reservationId: inserted.id,
     message: `New reservation request from ${customer.name}.`,
-    link: "/admin/reservations",
+    link: `/admin/reservations#reservation-${inserted.id}`,
   });
 
   revalidatePath("/", "layout");
@@ -105,7 +105,7 @@ export async function reviewReservation(reservationId: string, approve: boolean)
     type: approve ? "reservation_approved" : "reservation_rejected",
     reservationId,
     message: approve ? "A reservation was approved." : "A reservation was rejected.",
-    link: "/admin/reservations",
+    link: `/admin/reservations#reservation-${reservationId}`,
   });
 
   revalidatePath("/", "layout");

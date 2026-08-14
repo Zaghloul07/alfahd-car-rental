@@ -29,7 +29,10 @@
     "noCars": "لا توجد سيارات متاحة حاليًا — تابعنا قريبًا.",
     "from": "من",
     "to": "إلى",
-    "checkAvailability": "تحقق من التوفر"
+    "checkAvailability": "تحقق من التوفر",
+    "pickDatesTitle": "اختر تواريخك لمشاهدة السيارات المتاحة",
+    "pickDatesPrompt": "اختر تاريخ البداية والنهاية أعلاه لتصفح السيارات المناسبة لرحلتك.",
+    "reservedForDates": "محجوزة في هذه التواريخ"
   },
   "Buy": {
     "title": "شراء سيارة",
@@ -150,6 +153,7 @@
     "reservations": "الحجوزات",
     "handovers": "التسليم والاستلام",
     "reports": "التقارير",
+    "users": "المستخدمون",
     "viewSite": "عرض الموقع",
     "signOut": "تسجيل الخروج"
   },
@@ -262,13 +266,32 @@
     "revenue": "الإيرادات",
     "totalPaid": "إجمالي المدفوع",
     "fines": "الغرامات",
-    "noData": "لا توجد بيانات بعد."
+    "noData": "لا توجد بيانات بعد.",
+    "backToReport": "العودة إلى التقرير",
+    "noReservationsYet": "لا توجد حجوزات بعد.",
+    "dates": "التواريخ",
+    "amountPaid": "المبلغ المدفوع"
   },
   "AdminHandovers": {
     "title": "التسليم والاستلام",
     "noReservations": "لا توجد حجوزات بانتظار التسليم أو الاستلام.",
     "carGone": "السيارة لم تعد مدرجة",
     "unknownCustomer": "عميل غير معروف"
+  },
+  "AdminUsers": {
+    "title": "حسابات الفريق",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "created": "تاريخ الإنشاء",
+    "admin": "مدير",
+    "inspector": "مُفتش",
+    "addTitle": "إضافة حساب فريق",
+    "password": "كلمة المرور",
+    "passwordHint": "8 أحرف على الأقل.",
+    "selectRole": "اختر الدور",
+    "create": "إنشاء الحساب",
+    "creating": "جارٍ الإنشاء…",
+    "createdSuccess": "تم إنشاء الحساب."
   },
   "Charges": {
     "chargesTitle": "الغرامات",

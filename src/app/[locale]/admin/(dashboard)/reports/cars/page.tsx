@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { requireAdmin } from "@/lib/auth/dal";
 import { getCarReport } from "@/lib/reports/queries";
 import { formatEGP } from "@/lib/format";
@@ -27,7 +28,11 @@ export default async function AdminReportsCarsPage() {
             <tbody>
               {rows.map((row) => (
                 <tr key={row.carId} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-medium">{row.title}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link href={`/admin/reports/cars/${row.carId}`} className="text-brand hover:underline">
+                      {row.title}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3">{row.reservationCount}</td>
                   <td className="px-4 py-3">{formatEGP(row.revenue)}</td>
                   <td className="px-4 py-3">{formatEGP(row.finesTotal)}</td>

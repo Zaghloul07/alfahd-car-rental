@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { requireStaffOrAdmin } from "@/lib/auth/dal";
+import { requireInspectorOrAdmin } from "@/lib/auth/dal";
 import { logout } from "@/lib/auth/actions";
 import { getUnreadCount } from "@/lib/notifications/queries";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -11,7 +11,7 @@ import NotificationBell from "@/components/admin/NotificationBell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const [admin, t, cookieStore] = await Promise.all([
-    requireStaffOrAdmin(),
+    requireInspectorOrAdmin(),
     getTranslations("AdminNav"),
     cookies(),
   ]);
@@ -44,6 +44,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
                 >
                   {t("reports")}
+                </Link>
+                <Link
+                  href="/admin/users"
+                  className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
+                >
+                  {t("users")}
                 </Link>
               </>
             )}

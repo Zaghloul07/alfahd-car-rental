@@ -10,6 +10,7 @@ import { getChargesForReservation } from "@/lib/reservations/charges";
 import HandoverSummary from "@/components/HandoverSummary";
 import ChargesList from "@/components/ChargesList";
 import AddChargeForm from "@/components/admin/AddChargeForm";
+import HighlightTarget from "@/components/admin/HighlightTarget";
 import ReservationActions from "./ReservationActions";
 import ReservationConfirmPanel from "./ReservationConfirmPanel";
 import CancelReservationButton from "./CancelReservationButton";
@@ -57,11 +58,12 @@ export default async function AdminReservationsPage() {
 
   return (
     <div>
+      <HighlightTarget />
       <h1 className="mb-6 text-xl font-bold">{t("title")}</h1>
 
       <div className="space-y-4">
         {rows.map((r) => (
-          <div key={r.id} className="rounded-xl border border-border bg-card p-4">
+          <div key={r.id} id={`reservation-${r.id}`} className="rounded-xl border border-border bg-card p-4">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="relative h-14 w-20 flex-shrink-0 overflow-hidden rounded-md bg-placeholder">

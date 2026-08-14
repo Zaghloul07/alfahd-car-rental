@@ -36,7 +36,7 @@ export type ProfileRow = {
   id: string;
   email: string;
   is_admin: boolean;
-  role: "admin" | "staff" | null;
+  role: "admin" | "inspector" | null;
   created_at: string;
 };
 
@@ -117,7 +117,7 @@ export type NotificationType =
 
 export type NotificationRow = {
   id: string;
-  recipient_role: "admin" | "staff";
+  recipient_role: "admin" | "inspector";
   type: NotificationType;
   reservation_id: string | null;
   message: string;
@@ -195,7 +195,7 @@ export type Database = {
       };
       notifications: {
         Row: NotificationRow;
-        Insert: Partial<NotificationRow> & { recipient_role: "admin" | "staff"; type: NotificationType; message: string };
+        Insert: Partial<NotificationRow> & { recipient_role: "admin" | "inspector"; type: NotificationType; message: string };
         Update: Partial<NotificationRow>;
         Relationships: [];
       };

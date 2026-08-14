@@ -2,21 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireStaffOrAdmin } from "@/lib/auth/dal";
+import { requireInspectorOrAdmin } from "@/lib/auth/dal";
 import { getUnreadCount, getRecentNotifications } from "@/lib/notifications/queries";
 
 export async function getUnreadNotificationCount() {
-  const profile = await requireStaffOrAdmin();
+  const profile = await requireInspectorOrAdmin();
   return getUnreadCount(profile);
 }
 
 export async function getRecentNotificationsAction() {
-  const profile = await requireStaffOrAdmin();
+  const profile = await requireInspectorOrAdmin();
   return getRecentNotifications(profile);
 }
 
 export async function markNotificationRead(notificationId: string) {
-  await requireStaffOrAdmin();
+  await requireInspectorOrAdmin();
   const supabase = await createClient();
   const { error } = await supabase
     .from("notifications")
@@ -27,13 +27,13 @@ export async function markNotificationRead(notificationId: string) {
 }
 
 export async function markAllNotificationsRead() {
-  const profile = await requireStaffOrAdmin();
+  const profile = await requireInspectorOrAdmin();
   const supabase = await createClient();
   let query = supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
     .is("read_at", null);
-  if (!profile.is_admin) query = query.eq("recipient_role", profile.role ?? "staff");
+  if (!profile.is_admin) query = query.eq("recipient_role", profile.role ?? "inspector");
 
   const { error } = await query;
   if (error) throw new Error(error.message);

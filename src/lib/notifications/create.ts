@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { NotificationType } from "@/lib/supabase/types";
 
 export async function createNotification(params: {
-  recipientRole: "admin" | "staff";
+  recipientRole: "admin" | "inspector";
   type: NotificationType;
   reservationId?: string;
   message: string;

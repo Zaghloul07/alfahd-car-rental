@@ -50,7 +50,7 @@ export async function markReservationPaid(
     type: "payment_marked_paid",
     reservationId,
     message: "Payment was recorded for a reservation.",
-    link: "/admin/reservations",
+    link: `/admin/reservations#reservation-${reservationId}`,
   });
 
   revalidatePath("/", "layout");
@@ -102,11 +102,11 @@ export async function confirmReservation(reservationId: string) {
   if (error) throw new Error(error.message);
 
   await createNotification({
-    recipientRole: "staff",
+    recipientRole: "inspector",
     type: "reservation_confirmed",
     reservationId,
     message: "A reservation is confirmed and ready for delivery.",
-    link: "/admin/handovers",
+    link: `/admin/handovers#reservation-${reservationId}`,
   });
 
   revalidatePath("/", "layout");
@@ -137,7 +137,7 @@ export async function cancelReservation(reservationId: string) {
     type: "reservation_cancelled",
     reservationId,
     message: "A reservation was cancelled.",
-    link: "/admin/reservations",
+    link: `/admin/reservations#reservation-${reservationId}`,
   });
 
   revalidatePath("/", "layout");
