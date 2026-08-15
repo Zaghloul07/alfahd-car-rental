@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import type { ResolvedHandover } from "@/lib/handovers/photos";
+import type { HandoverDamageFindingRow } from "@/lib/supabase/types";
 import { formatEGP } from "@/lib/format";
 
 type RentalPeriod = { startDate: string; endDate: string; dailyPrice: number };
@@ -12,9 +13,11 @@ function daysBetween(start: string, end: string) {
 export default async function HandoverSummary({
   handover,
   period,
+  findings,
 }: {
   handover: ResolvedHandover;
   period?: RentalPeriod;
+  findings?: HandoverDamageFindingRow[];
 }) {
   const t = await getTranslations("Handover");
 
@@ -66,6 +69,21 @@ export default async function HandoverSummary({
               {pricing.diff > 0 ? t("additionalDue") : t("refundDue")}: {formatEGP(Math.abs(pricing.diff))}
             </p>
           )}
+        </div>
+      )}
+
+      {handover.type === "return" && findings && findings.length > 0 && (
+        <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-400">{t("aiDamageCheck")}</p>
+          <ul className="mt-1 space-y-1 text-sm text-amber-800/90 dark:text-amber-400/90">
+            {findings.map((f) => (
+              <li key={f.id}>
+                <span className="font-medium">{t(`bodyAngle_${f.angle}`)}: </span>
+                {f.finding}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-amber-700/70 dark:text-amber-400/60">{t("aiDamageDisclaimer")}</p>
         </div>
       )}
 

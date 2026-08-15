@@ -8,6 +8,7 @@ import ImageUploadField from "@/components/ImageUploadField";
 import type { FuelLevel, HandoverType } from "@/lib/supabase/types";
 
 const FUEL_LEVELS: FuelLevel[] = ["empty", "quarter", "half", "three_quarter", "full"];
+const BODY_ANGLES = ["front", "back", "left", "right"] as const;
 
 export default function HandoverForm({
   reservationId,
@@ -103,18 +104,27 @@ export default function HandoverForm({
         </label>
       </div>
 
-      <label className="block">
+      <div>
         <span className="mb-1 block text-sm font-medium">{t("bodyPhotos")}</span>
-        <ImageUploadField
-          name="body_photos"
-          multiple
-          capture="environment"
-          required
-          removeLabel={t("removePhoto")}
-          className="w-full text-sm"
-        />
-        <span className="mt-1 block text-xs text-foreground/50">{t("bodyPhotosHint")}</span>
-      </label>
+        <span className="mb-2 block text-xs text-foreground/50">{t("bodyPhotosHint")}</span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {BODY_ANGLES.map((angle) => (
+            <label key={angle} className="block">
+              <span className="mb-1 block text-xs font-medium text-foreground/70">
+                {t(`bodyAngle_${angle}`)}
+              </span>
+              <ImageUploadField
+                name={`body_${angle}_photo`}
+                multiple={false}
+                capture="environment"
+                required
+                removeLabel={t("removePhoto")}
+                className="w-full text-sm"
+              />
+            </label>
+          ))}
+        </div>
+      </div>
 
       <div>
         <span className="mb-1 block text-sm font-medium">{t("customerSignature")}</span>

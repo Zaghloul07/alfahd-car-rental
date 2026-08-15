@@ -5,7 +5,10 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireInspectorOrAdmin } from "@/lib/auth/dal";
 import { createNotification } from "@/lib/notifications/create";
-import type { HandoverPhotoType, HandoverType } from "@/lib/supabase/types";
+import { detectReturnDamage } from "@/lib/handovers/damage-detection";
+import type { DamageAngle, HandoverPhotoType, HandoverType } from "@/lib/supabase/types";
+
+const BODY_ANGLES: DamageAngle[] = ["front", "back", "left", "right"];
 
 const handoverSchema = z.object({
   odometer_km: z.coerce.number().int().min(0),
@@ -70,9 +73,10 @@ export async function submitHandover(
 
   const odometerPhoto = formData.get("odometer_photo");
   const fuelPhoto = formData.get("fuel_photo");
-  const bodyPhotos = formData
-    .getAll("body_photos")
-    .filter((f): f is File => f instanceof File && f.size > 0);
+  const bodyPhotos = BODY_ANGLES.map((angle) => ({
+    angle,
+    file: formData.get(`body_${angle}_photo`),
+  }));
 
   if (!(odometerPhoto instanceof File) || !odometerPhoto.size) {
     return { error: "Add a photo of the odometer." };
@@ -80,8 +84,10 @@ export async function submitHandover(
   if (!(fuelPhoto instanceof File) || !fuelPhoto.size) {
     return { error: "Add a photo of the fuel gauge." };
   }
-  if (bodyPhotos.length === 0) {
-    return { error: "Add at least one photo of the car body." };
+  for (const { file } of bodyPhotos) {
+    if (!(file instanceof File) || !file.size) {
+      return { error: "Add a photo of every side of the car (front, back, left, right)." };
+    }
   }
 
   const handoverId = crypto.randomUUID();
@@ -104,7 +110,9 @@ export async function submitHandover(
 
     await uploadPhoto(odometerPhoto, "odometer");
     await uploadPhoto(fuelPhoto, "fuel");
-    await Promise.all(bodyPhotos.map((file) => uploadPhoto(file, "body")));
+    await Promise.all(
+      bodyPhotos.map(({ angle, file }) => uploadPhoto(file as File, `body_${angle}` as HandoverPhotoType))
+    );
 
     const { error: insertError } = await supabase.from("handover_reports").insert({
       id: handoverId,
@@ -131,6 +139,10 @@ export async function submitHandover(
     if (statusError) throw statusError;
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Could not save the inspection. Please try again." };
+  }
+
+  if (type === "return") {
+    await detectReturnDamage(supabase, reservationId);
   }
 
   await createNotification({

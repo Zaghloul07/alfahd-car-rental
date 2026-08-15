@@ -7,6 +7,7 @@ import { resolveHandoverForDisplay } from "@/lib/handovers/photos";
 import { hasSubmittedDocuments } from "@/lib/auth/customer-dal";
 import { requireAdmin } from "@/lib/auth/dal";
 import { getChargesForReservation } from "@/lib/reservations/charges";
+import { getDamageFindingsForReservation } from "@/lib/handovers/findings";
 import HandoverSummary from "@/components/HandoverSummary";
 import ChargesList from "@/components/ChargesList";
 import AddChargeForm from "@/components/admin/AddChargeForm";
@@ -52,6 +53,7 @@ export default async function AdminReservationsPage() {
         delivery: handovers.find((h) => h.type === "delivery") ?? null,
         return: handovers.find((h) => h.type === "return") ?? null,
         charges: r.status === "completed" ? await getChargesForReservation(r.id) : [],
+        damageFindings: r.status === "completed" ? await getDamageFindingsForReservation(r.id) : [],
       };
     })
   );
@@ -145,6 +147,7 @@ export default async function AdminReservationsPage() {
                       ? { startDate: r.start_date, endDate: r.end_date, dailyPrice: r.cars.daily_price }
                       : undefined
                   }
+                  findings={r.damageFindings}
                 />
               </div>
             )}

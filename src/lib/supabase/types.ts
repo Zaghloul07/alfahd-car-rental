@@ -81,7 +81,8 @@ export type ReservationRow = {
 
 export type HandoverType = "delivery" | "return";
 export type FuelLevel = "empty" | "quarter" | "half" | "three_quarter" | "full";
-export type HandoverPhotoType = "odometer" | "fuel" | "body";
+export type HandoverPhotoType = "odometer" | "fuel" | "body_front" | "body_back" | "body_left" | "body_right";
+export type DamageAngle = "front" | "back" | "left" | "right";
 
 export type HandoverReportRow = {
   id: string;
@@ -133,6 +134,14 @@ export type ReservationChargeRow = {
   amount: number;
   reason: string;
   created_by: string;
+  created_at: string;
+};
+
+export type HandoverDamageFindingRow = {
+  id: string;
+  reservation_id: string;
+  angle: DamageAngle;
+  finding: string;
   created_at: string;
 };
 
@@ -209,6 +218,16 @@ export type Database = {
           created_by: string;
         };
         Update: Partial<ReservationChargeRow>;
+        Relationships: [];
+      };
+      handover_damage_findings: {
+        Row: HandoverDamageFindingRow;
+        Insert: Partial<HandoverDamageFindingRow> & {
+          reservation_id: string;
+          angle: DamageAngle;
+          finding: string;
+        };
+        Update: Partial<HandoverDamageFindingRow>;
         Relationships: [];
       };
     };
