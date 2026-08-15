@@ -3,9 +3,13 @@
 -- matched by angle for damage comparison. Also adds the table AI damage
 -- findings get stored in. Run after schema_handover_return_date.sql.
 
+-- 'body' is kept as a still-allowed legacy value so existing rows from
+-- before this change (which can't be retroactively assigned an angle)
+-- aren't rejected — the AI comparison just skips reservations whose
+-- delivery/return photos are still the old unlabeled 'body' type.
 alter table public.handover_photos drop constraint if exists handover_photos_photo_type_check;
 alter table public.handover_photos add constraint handover_photos_photo_type_check
-  check (photo_type in ('odometer', 'fuel', 'body_front', 'body_back', 'body_left', 'body_right'));
+  check (photo_type in ('odometer', 'fuel', 'body', 'body_front', 'body_back', 'body_left', 'body_right'));
 
 create table if not exists public.handover_damage_findings (
   id uuid primary key default gen_random_uuid(),
