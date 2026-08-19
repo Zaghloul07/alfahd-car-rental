@@ -31,7 +31,7 @@ export default async function AdminReportsCustomersPage() {
               {rows.map((row) => (
                 <tr key={row.customerId} className="border-b border-border last:border-0">
                   <td className="px-4 py-3 font-medium">
-                    <Link href={`/admin/reports/customers/${row.customerId}`} className="text-brand hover:underline">
+                    <Link href={`/admin-portal/reports/customers/${row.customerId}`} className="text-brand hover:underline">
                       {row.name}
                     </Link>
                   </td>

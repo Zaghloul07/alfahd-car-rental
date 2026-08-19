@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold">{t("title")}</h1>
         <Link
-          href="/admin/cars/new"
+          href="/admin-portal/cars/new"
           className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
         >
           {t("addCar")}
@@ -62,7 +62,7 @@ export default async function AdminDashboardPage() {
                   <td className="whitespace-nowrap px-4 py-3 text-end">
                     <div className="flex justify-end gap-3">
                       <Link
-                        href={`/admin/cars/${car.id}/edit`}
+                        href={`/admin-portal/cars/${car.id}/edit`}
                         className="font-medium text-brand hover:underline"
                       >
                         {t("edit")}

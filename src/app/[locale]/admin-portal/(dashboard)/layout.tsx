@@ -23,30 +23,30 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-white dark:bg-black">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-          <Link href="/admin" className="flex shrink-0 items-center gap-3">
+          <Link href="/admin-portal" className="flex shrink-0 items-center gap-3">
             <Logo className="h-10 w-auto sm:h-14" priority />
             <span className="hidden text-lg font-bold text-brand sm:inline">{t("brand")}</span>
           </Link>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:gap-x-4 sm:text-sm">
             {isFullAdmin && (
               <>
-                <Link href="/admin" className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand">
+                <Link href="/admin-portal" className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand">
                   {t("cars")}
                 </Link>
                 <Link
-                  href="/admin/reservations"
+                  href="/admin-portal/reservations"
                   className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
                 >
                   {t("reservations")}
                 </Link>
                 <Link
-                  href="/admin/reports"
+                  href="/admin-portal/reports"
                   className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
                 >
                   {t("reports")}
                 </Link>
                 <Link
-                  href="/admin/users"
+                  href="/admin-portal/users"
                   className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
                 >
                   {t("users")}
@@ -54,7 +54,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </>
             )}
             <Link
-              href="/admin/handovers"
+              href="/admin-portal/handovers"
               className="whitespace-nowrap font-medium text-foreground/70 hover:text-brand"
             >
               {t("handovers")}

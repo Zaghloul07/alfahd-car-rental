@@ -30,7 +30,7 @@ export default async function AdminReportCustomerDetailPage({
       <h1 className="mb-6 text-xl font-bold">{t("title")}</h1>
       <ReportsNav active="customers" />
 
-      <Link href="/admin/reports/customers" className="text-sm font-medium text-brand hover:underline">
+      <Link href="/admin-portal/reports/customers" className="text-sm font-medium text-brand hover:underline">
         ← {t("backToReport")}
       </Link>
 

@@ -4,9 +4,9 @@ import { Link } from "@/i18n/navigation";
 export default async function ReportsNav({ active }: { active: "overview" | "cars" | "customers" }) {
   const t = await getTranslations("AdminReports");
   const tabs = [
-    { key: "overview", href: "/admin/reports", label: t("overview") },
-    { key: "cars", href: "/admin/reports/cars", label: t("byCar") },
-    { key: "customers", href: "/admin/reports/customers", label: t("byCustomer") },
+    { key: "overview", href: "/admin-portal/reports", label: t("overview") },
+    { key: "cars", href: "/admin-portal/reports/cars", label: t("byCar") },
+    { key: "customers", href: "/admin-portal/reports/customers", label: t("byCustomer") },
   ] as const;
 
   return (
