@@ -6,6 +6,7 @@ import { getReservationsForCustomer } from "@/lib/reservations";
 import { getHandoversForReservation } from "@/lib/handovers";
 import { resolveHandoverForDisplay } from "@/lib/handovers/photos";
 import { getChargesForReservation } from "@/lib/reservations/charges";
+import { getDamageFindingsForReservation } from "@/lib/handovers/findings";
 import { formatEGP } from "@/lib/format";
 import HandoverSummary from "@/components/HandoverSummary";
 import ChargesList from "@/components/ChargesList";
@@ -36,6 +37,7 @@ export default async function MyReservationsPage() {
         ? await Promise.all((await getHandoversForReservation(r.id)).map(resolveHandoverForDisplay))
         : [],
       charges: r.status === "completed" ? await getChargesForReservation(r.id) : [],
+      damageFindings: r.status === "completed" ? await getDamageFindingsForReservation(r.id) : [],
     }))
   );
 
@@ -103,7 +105,16 @@ export default async function MyReservationsPage() {
             {r.handovers.length > 0 && (
               <div className="mt-4 space-y-3 border-t border-border pt-4">
                 {r.handovers.map((h, i) => (
-                  <HandoverSummary key={i} handover={h} />
+                  <HandoverSummary
+                    key={i}
+                    handover={h}
+                    period={
+                      h.type === "return" && r.start_date && r.end_date && r.cars?.daily_price != null
+                        ? { startDate: r.start_date, endDate: r.end_date, dailyPrice: r.cars.daily_price }
+                        : undefined
+                    }
+                    findings={h.type === "return" ? r.damageFindings : undefined}
+                  />
                 ))}
               </div>
             )}

@@ -2,9 +2,11 @@ import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCurrentCustomer } from "@/lib/auth/customer-dal";
+import { getUnreadCountForCustomer } from "@/lib/notifications/queries";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Logo from "@/components/Logo";
+import CustomerNotificationBell from "@/components/CustomerNotificationBell";
 
 export default async function Navbar() {
   const [customer, t, cookieStore] = await Promise.all([
@@ -13,6 +15,7 @@ export default async function Navbar() {
     cookies(),
   ]);
   const isDark = cookieStore.get("theme")?.value === "dark";
+  const unreadCount = customer ? await getUnreadCountForCustomer(customer.id) : 0;
 
   const links = [
     { href: "/rent", label: t("rent") },
@@ -32,9 +35,12 @@ export default async function Navbar() {
             </Link>
           ))}
           {customer ? (
-            <Link href="/account" className="whitespace-nowrap hover:text-brand">
-              {t("myAccount")}
-            </Link>
+            <>
+              <Link href="/account" className="whitespace-nowrap hover:text-brand">
+                {t("myAccount")}
+              </Link>
+              <CustomerNotificationBell initialCount={unreadCount} />
+            </>
           ) : (
             <>
               <Link href="/login" className="whitespace-nowrap hover:text-brand">

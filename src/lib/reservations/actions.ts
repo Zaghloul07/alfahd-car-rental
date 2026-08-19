@@ -69,23 +69,22 @@ export async function reviewReservation(reservationId: string, approve: boolean)
   const admin = await requireAdmin();
   const supabase = await createClient();
 
-  if (approve) {
-    const { data: reservation, error: fetchError } = await supabase
-      .from("reservations")
-      .select("car_id, start_date, end_date")
-      .eq("id", reservationId)
-      .single();
-    if (fetchError || !reservation) throw new Error("Reservation not found.");
-    if (reservation.start_date && reservation.end_date) {
-      const available = await isCarAvailable(
-        reservation.car_id,
-        reservation.start_date,
-        reservation.end_date,
-        reservationId
-      );
-      if (!available) {
-        throw new Error("These dates are no longer available for this car.");
-      }
+  const { data: reservation, error: fetchError } = await supabase
+    .from("reservations")
+    .select("car_id, customer_id, start_date, end_date")
+    .eq("id", reservationId)
+    .single();
+  if (fetchError || !reservation) throw new Error("Reservation not found.");
+
+  if (approve && reservation.start_date && reservation.end_date) {
+    const available = await isCarAvailable(
+      reservation.car_id,
+      reservation.start_date,
+      reservation.end_date,
+      reservationId
+    );
+    if (!available) {
+      throw new Error("These dates are no longer available for this car.");
     }
   }
 
@@ -101,11 +100,12 @@ export async function reviewReservation(reservationId: string, approve: boolean)
   if (error) throw new Error(error.message);
 
   await createNotification({
-    recipientRole: "admin",
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
     type: approve ? "reservation_approved" : "reservation_rejected",
     reservationId,
-    message: approve ? "A reservation was approved." : "A reservation was rejected.",
-    link: `/admin/reservations#reservation-${reservationId}`,
+    message: approve ? "Your reservation was approved." : "Your reservation was rejected.",
+    link: `/account/reservations`,
   });
 
   revalidatePath("/", "layout");

@@ -36,7 +36,7 @@ export async function submitHandover(
 
   const { data: reservation, error: reservationError } = await supabase
     .from("reservations")
-    .select("status")
+    .select("status, customer_id")
     .eq("id", reservationId)
     .single();
   if (reservationError || !reservation) {
@@ -146,11 +146,12 @@ export async function submitHandover(
   }
 
   await createNotification({
-    recipientRole: "admin",
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
     type: type === "delivery" ? "handover_delivered" : "handover_returned",
     reservationId,
-    message: type === "delivery" ? "A car was delivered to a customer." : "A car was returned by a customer.",
-    link: `/admin/reservations#reservation-${reservationId}`,
+    message: type === "delivery" ? "Your car has been delivered." : "Your car return has been processed.",
+    link: `/account/reservations`,
   });
 
   revalidatePath("/", "layout");

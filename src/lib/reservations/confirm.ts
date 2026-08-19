@@ -24,7 +24,7 @@ export async function markReservationPaid(
 
   const { data: reservation, error: fetchError } = await supabase
     .from("reservations")
-    .select("status")
+    .select("status, customer_id")
     .eq("id", reservationId)
     .single();
   if (fetchError || !reservation) return { error: "Reservation not found." };
@@ -46,11 +46,12 @@ export async function markReservationPaid(
   if (error) return { error: "Could not record the payment. Please try again." };
 
   await createNotification({
-    recipientRole: "admin",
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
     type: "payment_marked_paid",
     reservationId,
-    message: "Payment was recorded for a reservation.",
-    link: `/admin/reservations#reservation-${reservationId}`,
+    message: "Your payment was recorded.",
+    link: `/account/reservations`,
   });
 
   revalidatePath("/", "layout");
@@ -109,6 +110,15 @@ export async function confirmReservation(reservationId: string) {
     link: `/admin/handovers#reservation-${reservationId}`,
   });
 
+  await createNotification({
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
+    type: "reservation_confirmed",
+    reservationId,
+    message: "Your reservation is confirmed — your car will be delivered soon.",
+    link: `/account/reservations`,
+  });
+
   revalidatePath("/", "layout");
 }
 
@@ -118,7 +128,7 @@ export async function cancelReservation(reservationId: string) {
 
   const { data: reservation, error: fetchError } = await supabase
     .from("reservations")
-    .select("status")
+    .select("status, customer_id")
     .eq("id", reservationId)
     .single();
   if (fetchError || !reservation) throw new Error("Reservation not found.");
@@ -133,11 +143,12 @@ export async function cancelReservation(reservationId: string) {
   if (error) throw new Error(error.message);
 
   await createNotification({
-    recipientRole: "admin",
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
     type: "reservation_cancelled",
     reservationId,
-    message: "A reservation was cancelled.",
-    link: `/admin/reservations#reservation-${reservationId}`,
+    message: "Your reservation was cancelled.",
+    link: `/account/reservations`,
   });
 
   revalidatePath("/", "layout");

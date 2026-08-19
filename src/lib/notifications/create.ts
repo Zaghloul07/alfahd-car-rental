@@ -3,9 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import type { NotificationType } from "@/lib/supabase/types";
 
 export async function createNotification(params: {
-  recipientRole: "admin" | "inspector";
+  recipientRole: "admin" | "inspector" | "customer";
   type: NotificationType;
   reservationId?: string;
+  customerId?: string;
   message: string;
   link?: string;
 }) {
@@ -17,6 +18,7 @@ export async function createNotification(params: {
       p_reservation_id: params.reservationId ?? null,
       p_message: params.message,
       p_link: params.link ?? null,
+      p_customer_id: params.customerId ?? null,
     });
     if (error) throw error;
   } catch (err) {

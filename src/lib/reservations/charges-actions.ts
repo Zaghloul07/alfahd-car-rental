@@ -23,7 +23,7 @@ export async function addReservationCharge(
 
   const { data: reservation, error: fetchError } = await supabase
     .from("reservations")
-    .select("status")
+    .select("status, customer_id")
     .eq("id", reservationId)
     .single();
   if (fetchError || !reservation) return { error: "Reservation not found." };
@@ -50,11 +50,12 @@ export async function addReservationCharge(
   if (error) return { error: "Could not save the charge. Please try again." };
 
   await createNotification({
-    recipientRole: "admin",
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
     type: "fine_added",
     reservationId,
-    message: `A charge of ${fields.amount} EGP was added to a completed reservation.`,
-    link: `/admin/reservations#reservation-${reservationId}`,
+    message: `A charge of ${fields.amount} EGP was added to your reservation.`,
+    link: `/account/reservations`,
   });
 
   revalidatePath("/", "layout");

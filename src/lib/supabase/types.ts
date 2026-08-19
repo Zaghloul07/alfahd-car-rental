@@ -119,9 +119,10 @@ export type NotificationType =
 
 export type NotificationRow = {
   id: string;
-  recipient_role: "admin" | "inspector";
+  recipient_role: "admin" | "inspector" | "customer";
   type: NotificationType;
   reservation_id: string | null;
+  customer_id: string | null;
   message: string;
   link: string | null;
   read_at: string | null;
@@ -205,7 +206,11 @@ export type Database = {
       };
       notifications: {
         Row: NotificationRow;
-        Insert: Partial<NotificationRow> & { recipient_role: "admin" | "inspector"; type: NotificationType; message: string };
+        Insert: Partial<NotificationRow> & {
+          recipient_role: "admin" | "inspector" | "customer";
+          type: NotificationType;
+          message: string;
+        };
         Update: Partial<NotificationRow>;
         Relationships: [];
       };
@@ -244,6 +249,7 @@ export type Database = {
           p_reservation_id: string | null;
           p_message: string;
           p_link: string | null;
+          p_customer_id: string | null;
         };
         Returns: undefined;
       };
