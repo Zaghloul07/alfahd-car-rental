@@ -57,7 +57,7 @@ export async function createReservation(
     type: "reservation_created",
     reservationId: inserted.id,
     message: `New reservation request from ${customer.name}.`,
-    link: `/admin/reservations#reservation-${inserted.id}`,
+    link: `/admin-portal/reservations#reservation-${inserted.id}`,
   });
 
   revalidatePath("/", "layout");

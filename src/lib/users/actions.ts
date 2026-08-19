@@ -38,6 +38,6 @@ export async function createTeamUser(
     return { error: "Account created but role assignment failed. Set it manually in Supabase." };
   }
 
-  revalidatePath("/admin/users");
+  revalidatePath("/admin-portal/users");
   return { success: true };
 }

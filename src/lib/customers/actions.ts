@@ -63,7 +63,7 @@ export async function uploadDocuments(
         recipientRole: "admin",
         type: "documents_submitted",
         message: `${customer.name} uploaded their verification documents.`,
-        link: "/admin/reservations",
+        link: "/admin-portal/reservations",
       });
     }
   } catch {

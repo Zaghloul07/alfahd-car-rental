@@ -32,16 +32,6 @@ export default async function Footer() {
                 </li>
               </ul>
             </div>
-            <div>
-              <p className="mb-2 font-semibold text-foreground">{t("company")}</p>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/admin/login" className="hover:text-brand">
-                    {t("admin")}
-                  </Link>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
         <p className="mt-10 text-xs text-foreground/50">

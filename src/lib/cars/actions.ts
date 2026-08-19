@@ -76,7 +76,7 @@ export async function createCar(_state: CarFormState, formData: FormData): Promi
 
   revalidatePath("/", "layout");
   const locale = await getLocale();
-  redirect({ href: "/admin", locale });
+  redirect({ href: "/admin-portal", locale });
 }
 
 export async function updateCar(
@@ -102,7 +102,7 @@ export async function updateCar(
 
   revalidatePath("/", "layout");
   const locale = await getLocale();
-  redirect({ href: "/admin", locale });
+  redirect({ href: "/admin-portal", locale });
 }
 
 export async function deleteCar(id: string) {

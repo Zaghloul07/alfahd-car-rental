@@ -107,7 +107,7 @@ export async function confirmReservation(reservationId: string) {
     type: "reservation_confirmed",
     reservationId,
     message: "A reservation is confirmed and ready for delivery.",
-    link: `/admin/handovers#reservation-${reservationId}`,
+    link: `/admin-portal/handovers#reservation-${reservationId}`,
   });
 
   await createNotification({

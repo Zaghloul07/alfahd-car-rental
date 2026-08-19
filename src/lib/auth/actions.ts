@@ -33,7 +33,7 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
   }
 
   const locale = await getLocale();
-  redirect({ href: "/admin", locale });
+  redirect({ href: "/admin-portal", locale });
 }
 
 export async function logout() {

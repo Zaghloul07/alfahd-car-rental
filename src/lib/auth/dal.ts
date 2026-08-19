@@ -28,7 +28,7 @@ export async function requireAdmin() {
   if (admin) return admin;
 
   const locale = await getLocale();
-  redirect({ href: "/admin/login", locale });
+  redirect({ href: "/admin-portal/login", locale });
   // `redirect`'s `never` return type isn't resolved under plain `tsc`
   // (no react-server export condition), so narrow explicitly.
   throw new Error("unreachable");
@@ -58,6 +58,6 @@ export async function requireInspectorOrAdmin() {
   if (profile) return profile;
 
   const locale = await getLocale();
-  redirect({ href: "/admin/login", locale });
+  redirect({ href: "/admin-portal/login", locale });
   throw new Error("unreachable");
 }

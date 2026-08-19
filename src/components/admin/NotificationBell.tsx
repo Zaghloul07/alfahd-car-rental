@@ -101,7 +101,7 @@ export default function NotificationBell({ initialCount }: { initialCount: numbe
                   }`}
                 >
                   <Link
-                    href={n.link ?? "/admin/reservations"}
+                    href={n.link ?? "/admin-portal/reservations"}
                     onClick={() => {
                       setOpen(false);
                       if (!n.read_at) handleMarkOne(n.id);

@@ -39,13 +39,13 @@ export async function updateSession(request: NextRequest, response: NextResponse
   } = await supabase.auth.getUser();
 
   const { locale, rest } = stripLocale(request.nextUrl.pathname);
-  const isAdminRoute = rest.startsWith("/admin");
-  const isAdminLoginRoute = rest === "/admin/login";
+  const isAdminRoute = rest.startsWith("/admin-portal");
+  const isAdminLoginRoute = rest === "/admin-portal/login";
   const isAccountRoute = rest.startsWith("/account");
 
   if (isAdminRoute && !isAdminLoginRoute && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}/admin/login`;
+    url.pathname = `/${locale}/admin-portal/login`;
     return NextResponse.redirect(url);
   }
 

@@ -6,7 +6,7 @@ Rent or buy a car in Egypt — Next.js + Supabase.
 - `/buy` — browse used cars for sale
 - `/signup`, `/login` — customer accounts (phone + password)
 - `/account` — customer dashboard: verification documents, reservation history
-- `/admin` — protected dashboard for managing car listings and reservation requests
+- `/admin-portal` — protected dashboard for managing car listings and reservation requests
 
 ## Setup
 
@@ -16,7 +16,7 @@ Go to [supabase.com](https://supabase.com), create a new project, and grab these
 
 - Project URL
 - Publishable key (`sb_publishable_...`)
-- `service_role` secret key — needed for the admin-only "create team accounts" feature (`/admin/users`). Keep this secret; it must never reach the browser.
+- `service_role` secret key — needed for the admin-only "create team accounts" feature (`/admin-portal/users`). Keep this secret; it must never reach the browser.
 
 Also grab a **free** Gemini API key from [aistudio.google.com](https://aistudio.google.com) (Get API Key) — powers the optional AI damage-detection feature on car returns. No credit card required; the free tier's daily quota comfortably covers normal usage for a small fleet. If you skip this, everything else works fine — damage detection is silently skipped when the key is missing.
 
@@ -57,8 +57,8 @@ Also in **Authentication → Sign In / Providers**, turn **off** "Confirm email"
    ```sql
    update public.profiles set is_admin = true where email = 'you@example.com';
    ```
-3. Sign in at `/admin/login`.
-4. From then on, create additional Admin or Inspector accounts from `/admin/users` instead of via SQL.
+3. Sign in at `/admin-portal/login`.
+4. From then on, create additional Admin or Inspector accounts from `/admin-portal/users` instead of via SQL.
 
 ### 5. Run the app
 
@@ -71,13 +71,14 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Notes
 
 - Placeholder car photos in `public/cars/*.svg` are original illustrations, not scraped images — swap them out via the admin upload form once you have real photos.
-- Car images uploaded through `/admin` go to the public `car-images` bucket; customer ID/license uploads go to the private `customer-documents` bucket (owner + admin read only, via signed URLs).
+- Car images uploaded through `/admin-portal` go to the public `car-images` bucket; customer ID/license uploads go to the private `customer-documents` bucket (owner + admin read only, via signed URLs).
 - Customers sign up with **name + phone + password** — no SMS/OTP verification yet (deferred by request). Under the hood this uses Supabase email/password auth with a synthetic, non-deliverable email derived from the phone number — see `src/lib/phone.ts`.
-- Renting flow: a customer picks dates on a car page (checked live against `get_car_availability()`, so already-booked ranges are shown and blocked) and submits a reservation request — no documents required yet. It sits as `pending` until an admin approves/rejects it at `/admin/reservations`. Once approved, the customer uploads their national ID (front/back) and driving license and the admin records the payment; only then can the admin **confirm** the reservation, which re-checks the dates are still free and moves it into the staff handover queue at `/admin/handovers` for delivery. A reservation can be **cancelled** by an admin any time it's `pending`, `approved`, or `confirmed` (not after delivery). Contract generation on approval is intentionally not built yet — planned as a later phase.
-- Returns can happen early — submitting the return inspection immediately frees the car for any future dates regardless of the agreed end date, since a `completed` reservation no longer blocks availability. The return form also asks for the actual **return date** (defaults to today, can be backdated), which is used to show the admin the agreed rental cost (per the original dates) next to the actual cost (per the real return date) so they can see at a glance whether a refund or an extra charge is owed. Logging that as an actual transaction is still a manual step — the "Add a charge or refund" form on a completed reservation records either a `charge` (damage, late return) or a `refund` (early return, goodwill) as a `reservation_charges` row; refunds are netted out of the revenue figures in `/admin/reports` (by the month the refund itself was issued, not the original booking month).
-- Delivery and return inspections capture one photo per side of the car (front/back/left/right) instead of an unlabeled batch, so the two sets can be matched up angle-by-angle. When a return is submitted, each angle pair is sent to Gemini (if `GEMINI_API_KEY` is set) asking it to describe any *new* damage visible in the return photo that wasn't in the delivery photo. Findings are stored in `handover_damage_findings` and shown as a flagged "AI damage check" note — visible to both staff (`/admin/reservations`) and the customer themselves (`/account/reservations`) — for review before charging anything; it never auto-charges.
-- A lightweight `inspector` role (`profiles.role = 'inspector'`, separate from `is_admin`) can sign in at `/admin/login` but only sees the handover queue, customer contact info, and cars — not listings management, reservation approval, reports, or the users page. Full admins create Admin or Inspector accounts from `/admin/users` (uses the Supabase service-role key server-side — the new account's session is separate from the admin's own).
+- Renting flow: a customer picks dates on a car page (checked live against `get_car_availability()`, so already-booked ranges are shown and blocked) and submits a reservation request — no documents required yet. It sits as `pending` until an admin approves/rejects it at `/admin-portal/reservations`. Once approved, the customer uploads their national ID (front/back) and driving license and the admin records the payment; only then can the admin **confirm** the reservation, which re-checks the dates are still free and moves it into the staff handover queue at `/admin-portal/handovers` for delivery. A reservation can be **cancelled** by an admin any time it's `pending`, `approved`, or `confirmed` (not after delivery). Contract generation on approval is intentionally not built yet — planned as a later phase.
+- Returns can happen early — submitting the return inspection immediately frees the car for any future dates regardless of the agreed end date, since a `completed` reservation no longer blocks availability. The return form also asks for the actual **return date** (defaults to today, can be backdated), which is used to show the admin the agreed rental cost (per the original dates) next to the actual cost (per the real return date) so they can see at a glance whether a refund or an extra charge is owed. Logging that as an actual transaction is still a manual step — the "Add a charge or refund" form on a completed reservation records either a `charge` (damage, late return) or a `refund` (early return, goodwill) as a `reservation_charges` row; refunds are netted out of the revenue figures in `/admin-portal/reports` (by the month the refund itself was issued, not the original booking month).
+- Delivery and return inspections capture one photo per side of the car (front/back/left/right) instead of an unlabeled batch, so the two sets can be matched up angle-by-angle. When a return is submitted, each angle pair is sent to Gemini (if `GEMINI_API_KEY` is set) asking it to describe any *new* damage visible in the return photo that wasn't in the delivery photo. Findings are stored in `handover_damage_findings` and shown as a flagged "AI damage check" note — visible to both staff (`/admin-portal/reservations`) and the customer themselves (`/account/reservations`) — for review before charging anything; it never auto-charges.
+- A lightweight `inspector` role (`profiles.role = 'inspector'`, separate from `is_admin`) can sign in at `/admin-portal/login` but only sees the handover queue, customer contact info, and cars — not listings management, reservation approval, reports, or the users page. Full admins create Admin or Inspector accounts from `/admin-portal/users` (uses the Supabase service-role key server-side — the new account's session is separate from the admin's own).
 - Notifications are split by who needs to know what: the **admin** bell only shows customer-initiated events (new reservation requests, documents submitted) — not the admin's own actions, since they already know what they just did. The **inspector** bell shows confirmed reservations ready for delivery. The **customer** (a bell in the site header, next to "My Account") gets notified for everything staff does on their reservation — approved/rejected, payment recorded, confirmed, delivered, returned, a charge added, cancelled. Clicking any notification jumps to the relevant page/reservation.
-- `/admin/reports` has charts (via `recharts`) for reservations-by-status and revenue-by-month, plus per-car and per-customer breakdowns — click a car or customer row to see its full reservation/charge history.
+- `/admin-portal/reports` has charts (via `recharts`) for reservations-by-status and revenue-by-month, plus per-car and per-customer breakdowns — click a car or customer row to see its full reservation/charge history.
 - `/rent` requires picking a date range before showing cars; once picked, every car for that period is shown, with already-reserved ones greyed out and non-clickable.
 - "Buy" listings still use a WhatsApp "Send Price Offer" link rather than the reservation flow — that flow is rent-only for now.
+- The admin area lives at `/admin-portal` (not `/admin`) and isn't linked from anywhere on the public site — there's no footer link or nav pointing to it. This is a minor deterrent against automated scanners, not real security; access is still enforced entirely by login (`requireAdmin`/`requireInspectorOrAdmin` + middleware), so bookmark the login URL directly.
