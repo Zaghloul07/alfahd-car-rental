@@ -32,7 +32,7 @@ async function callGeminiVision(
   if (!apiKey) return null;
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -48,7 +48,10 @@ async function callGeminiVision(
       }),
     }
   );
-  if (!response.ok) return null;
+  if (!response.ok) {
+    console.error(`Gemini API request failed: ${response.status} ${await response.text()}`);
+    return null;
+  }
 
   const json = await response.json();
   const text: string | undefined = json?.candidates?.[0]?.content?.parts?.[0]?.text;
