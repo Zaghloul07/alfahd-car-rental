@@ -24,6 +24,7 @@ export default async function AdminReportsCustomersPage() {
                 <th className="px-4 py-3 text-start font-medium">{t("reservations")}</th>
                 <th className="px-4 py-3 text-start font-medium">{t("totalPaid")}</th>
                 <th className="px-4 py-3 text-start font-medium">{t("fines")}</th>
+                <th className="px-4 py-3 text-start font-medium">{t("refunds")}</th>
               </tr>
             </thead>
             <tbody>
@@ -38,6 +39,7 @@ export default async function AdminReportsCustomersPage() {
                   <td className="px-4 py-3">{row.reservationCount}</td>
                   <td className="px-4 py-3">{formatEGP(row.totalPaid)}</td>
                   <td className="px-4 py-3">{formatEGP(row.finesTotal)}</td>
+                  <td className="px-4 py-3">{formatEGP(row.refundsTotal)}</td>
                 </tr>
               ))}
             </tbody>

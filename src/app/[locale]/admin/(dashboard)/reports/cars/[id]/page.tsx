@@ -45,11 +45,17 @@ export default async function AdminReportCarDetailPage({
                 <th className="px-4 py-3 text-start font-medium">{t("status")}</th>
                 <th className="px-4 py-3 text-start font-medium">{t("amountPaid")}</th>
                 <th className="px-4 py-3 text-start font-medium">{t("fines")}</th>
+                <th className="px-4 py-3 text-start font-medium">{t("refunds")}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => {
-                const finesTotal = r.reservation_charges.reduce((sum, c) => sum + c.amount, 0);
+                const finesTotal = r.reservation_charges
+                  .filter((c) => c.type !== "refund")
+                  .reduce((sum, c) => sum + c.amount, 0);
+                const refundsTotal = r.reservation_charges
+                  .filter((c) => c.type === "refund")
+                  .reduce((sum, c) => sum + c.amount, 0);
                 return (
                   <tr key={r.id} className="border-b border-border last:border-0">
                     <td className="px-4 py-3 font-medium">{r.customers?.name ?? "—"}</td>
@@ -59,6 +65,7 @@ export default async function AdminReportCarDetailPage({
                     <td className="px-4 py-3">{tStatus(r.status)}</td>
                     <td className="px-4 py-3">{formatEGP(r.amount_paid)}</td>
                     <td className="px-4 py-3">{formatEGP(finesTotal)}</td>
+                    <td className="px-4 py-3">{formatEGP(refundsTotal)}</td>
                   </tr>
                 );
               })}

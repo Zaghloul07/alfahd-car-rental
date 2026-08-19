@@ -11,6 +11,7 @@ export type ChargeActionState = { error?: string } | undefined;
 const chargeSchema = z.object({
   amount: z.coerce.number().positive(),
   reason: z.string().min(1),
+  type: z.enum(["charge", "refund"]),
 });
 
 export async function addReservationCharge(
@@ -36,15 +37,17 @@ export async function addReservationCharge(
     fields = chargeSchema.parse({
       amount: formData.get("amount"),
       reason: String(formData.get("reason") ?? "").trim(),
+      type: formData.get("type"),
     });
   } catch {
-    return { error: "Enter a valid amount and reason." };
+    return { error: "Enter a valid amount, reason, and type." };
   }
 
   const { error } = await supabase.from("reservation_charges").insert({
     reservation_id: reservationId,
     amount: fields.amount,
     reason: fields.reason,
+    type: fields.type,
     created_by: admin.id,
   });
   if (error) return { error: "Could not save the charge. Please try again." };
@@ -52,9 +55,12 @@ export async function addReservationCharge(
   await createNotification({
     recipientRole: "customer",
     customerId: reservation.customer_id,
-    type: "fine_added",
+    type: fields.type === "refund" ? "refund_issued" : "fine_added",
     reservationId,
-    message: `A charge of ${fields.amount} EGP was added to your reservation.`,
+    message:
+      fields.type === "refund"
+        ? `A refund of ${fields.amount} EGP was issued for your reservation.`
+        : `A charge of ${fields.amount} EGP was added to your reservation.`,
     link: `/account/reservations`,
   });
 

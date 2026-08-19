@@ -266,6 +266,7 @@
     "revenue": "الإيرادات",
     "totalPaid": "إجمالي المدفوع",
     "fines": "الغرامات",
+    "refunds": "المبالغ المستردة",
     "noData": "لا توجد بيانات بعد.",
     "backToReport": "العودة إلى التقرير",
     "noReservationsYet": "لا توجد حجوزات بعد.",
@@ -296,10 +297,13 @@
   "Charges": {
     "chargesTitle": "الغرامات",
     "total": "الإجمالي",
-    "addChargeTitle": "إضافة غرامة (ضرر، تأخير في الإرجاع، إلخ)",
+    "addChargeTitle": "إضافة غرامة أو استرداد",
+    "type": "النوع",
+    "typeCharge": "غرامة",
+    "typeRefund": "استرداد",
     "amount": "المبلغ (جنيه)",
     "reason": "السبب",
-    "addCharge": "إضافة غرامة",
+    "addCharge": "إضافة",
     "saving": "جارٍ الحفظ…"
   },
   "Handover": {

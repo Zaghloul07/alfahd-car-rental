@@ -14,6 +14,18 @@ export default function AddChargeForm({ reservationId }: { reservationId: string
       <p className="text-sm font-medium">{t("addChargeTitle")}</p>
       <div className="flex flex-wrap items-end gap-3">
         <label className="block">
+          <span className="mb-1 block text-xs font-medium text-foreground/70">{t("type")}</span>
+          <select
+            name="type"
+            required
+            defaultValue="charge"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-brand"
+          >
+            <option value="charge">{t("typeCharge")}</option>
+            <option value="refund">{t("typeRefund")}</option>
+          </select>
+        </label>
+        <label className="block">
           <span className="mb-1 block text-xs font-medium text-foreground/70">{t("amount")}</span>
           <input
             name="amount"

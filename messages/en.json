@@ -266,6 +266,7 @@
     "revenue": "Revenue",
     "totalPaid": "Total paid",
     "fines": "Fines",
+    "refunds": "Refunds",
     "noData": "No data yet.",
     "backToReport": "Back to report",
     "noReservationsYet": "No reservations yet.",
@@ -296,10 +297,13 @@
   "Charges": {
     "chargesTitle": "Charges",
     "total": "Total",
-    "addChargeTitle": "Add a charge (damage, late return, etc.)",
+    "addChargeTitle": "Add a charge or refund",
+    "type": "Type",
+    "typeCharge": "Charge",
+    "typeRefund": "Refund",
     "amount": "Amount (EGP)",
     "reason": "Reason",
-    "addCharge": "Add Charge",
+    "addCharge": "Add",
     "saving": "Saving…"
   },
   "Handover": {

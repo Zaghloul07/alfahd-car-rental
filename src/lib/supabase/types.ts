@@ -115,7 +115,8 @@ export type NotificationType =
   | "reservation_confirmed"
   | "handover_delivered"
   | "handover_returned"
-  | "fine_added";
+  | "fine_added"
+  | "refund_issued";
 
 export type NotificationRow = {
   id: string;
@@ -133,6 +134,7 @@ export type ReservationChargeRow = {
   id: string;
   reservation_id: string;
   amount: number;
+  type: "charge" | "refund";
   reason: string;
   created_by: string;
   created_at: string;

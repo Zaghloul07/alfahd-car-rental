@@ -16,23 +16,30 @@ export async function getOverviewStats(): Promise<OverviewStats> {
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const [activeReservations, pendingApprovals, upcomingDeliveries, paidThisMonth] = await Promise.all([
-    supabase
-      .from("reservations")
-      .select("id", { count: "exact", head: true })
-      .in("status", ["approved", "confirmed", "delivered"]),
-    supabase.from("reservations").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("reservations").select("id", { count: "exact", head: true }).eq("status", "confirmed"),
-    supabase.from("reservations").select("amount_paid").gte("paid_at", startOfMonth.toISOString()),
-  ]);
+  const [activeReservations, pendingApprovals, upcomingDeliveries, paidThisMonth, refundsThisMonth] =
+    await Promise.all([
+      supabase
+        .from("reservations")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["approved", "confirmed", "delivered"]),
+      supabase.from("reservations").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      supabase.from("reservations").select("id", { count: "exact", head: true }).eq("status", "confirmed"),
+      supabase.from("reservations").select("amount_paid").gte("paid_at", startOfMonth.toISOString()),
+      supabase
+        .from("reservation_charges")
+        .select("amount")
+        .eq("type", "refund")
+        .gte("created_at", startOfMonth.toISOString()),
+    ]);
 
-  const revenueThisMonth = (paidThisMonth.data ?? []).reduce((sum, r) => sum + (r.amount_paid ?? 0), 0);
+  const paid = (paidThisMonth.data ?? []).reduce((sum, r) => sum + (r.amount_paid ?? 0), 0);
+  const refunded = (refundsThisMonth.data ?? []).reduce((sum, c) => sum + c.amount, 0);
 
   return {
     activeReservations: activeReservations.count ?? 0,
     pendingApprovals: pendingApprovals.count ?? 0,
     upcomingDeliveries: upcomingDeliveries.count ?? 0,
-    revenueThisMonth,
+    revenueThisMonth: paid - refunded,
   };
 }
 
@@ -64,12 +71,20 @@ export async function getRevenueByMonth(monthsBack = 6): Promise<MonthlyRevenue[
   since.setDate(1);
   since.setHours(0, 0, 0, 0);
 
-  const { data, error } = await supabase
-    .from("reservations")
-    .select("amount_paid, paid_at")
-    .not("paid_at", "is", null)
-    .gte("paid_at", since.toISOString());
-  if (error) throw error;
+  const [{ data: paidData, error: paidError }, { data: refundData, error: refundError }] = await Promise.all([
+    supabase
+      .from("reservations")
+      .select("amount_paid, paid_at")
+      .not("paid_at", "is", null)
+      .gte("paid_at", since.toISOString()),
+    supabase
+      .from("reservation_charges")
+      .select("amount, created_at")
+      .eq("type", "refund")
+      .gte("created_at", since.toISOString()),
+  ]);
+  if (paidError) throw paidError;
+  if (refundError) throw refundError;
 
   const buckets = new Map<string, number>();
   for (let i = 0; i < monthsBack; i++) {
@@ -77,10 +92,14 @@ export async function getRevenueByMonth(monthsBack = 6): Promise<MonthlyRevenue[
     d.setMonth(d.getMonth() + i);
     buckets.set(monthKey(d), 0);
   }
-  for (const row of data ?? []) {
+  for (const row of paidData ?? []) {
     if (!row.paid_at) continue;
     const key = monthKey(new Date(row.paid_at));
     if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + (row.amount_paid ?? 0));
+  }
+  for (const row of refundData ?? []) {
+    const key = monthKey(new Date(row.created_at));
+    if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) - row.amount);
   }
   return Array.from(buckets.entries()).map(([month, revenue]) => ({ month, revenue }));
 }
@@ -95,6 +114,7 @@ export type CarReportRow = {
   reservationCount: number;
   revenue: number;
   finesTotal: number;
+  refundsTotal: number;
 };
 
 export async function getCarReport(): Promise<CarReportRow[]> {
@@ -103,23 +123,33 @@ export async function getCarReport(): Promise<CarReportRow[]> {
     await Promise.all([
       supabase.from("cars").select("id, title"),
       supabase.from("reservations").select("id, car_id, amount_paid"),
-      supabase.from("reservation_charges").select("reservation_id, amount"),
+      supabase.from("reservation_charges").select("reservation_id, amount, type"),
     ]);
   if (carsError) throw carsError;
   if (resError) throw resError;
   if (chargesError) throw chargesError;
 
-  const chargesByReservation = new Map<string, number>();
+  const finesByReservation = new Map<string, number>();
+  const refundsByReservation = new Map<string, number>();
   for (const c of charges ?? []) {
-    chargesByReservation.set(c.reservation_id, (chargesByReservation.get(c.reservation_id) ?? 0) + c.amount);
+    const map = c.type === "refund" ? refundsByReservation : finesByReservation;
+    map.set(c.reservation_id, (map.get(c.reservation_id) ?? 0) + c.amount);
   }
 
   return (cars ?? [])
     .map((car) => {
       const carReservations = (reservations ?? []).filter((r) => r.car_id === car.id);
-      const revenue = carReservations.reduce((sum, r) => sum + (r.amount_paid ?? 0), 0);
-      const finesTotal = carReservations.reduce((sum, r) => sum + (chargesByReservation.get(r.id) ?? 0), 0);
-      return { carId: car.id, title: car.title, reservationCount: carReservations.length, revenue, finesTotal };
+      const paid = carReservations.reduce((sum, r) => sum + (r.amount_paid ?? 0), 0);
+      const finesTotal = carReservations.reduce((sum, r) => sum + (finesByReservation.get(r.id) ?? 0), 0);
+      const refundsTotal = carReservations.reduce((sum, r) => sum + (refundsByReservation.get(r.id) ?? 0), 0);
+      return {
+        carId: car.id,
+        title: car.title,
+        reservationCount: carReservations.length,
+        revenue: paid - refundsTotal,
+        finesTotal,
+        refundsTotal,
+      };
     })
     .sort((a, b) => b.revenue - a.revenue);
 }
@@ -131,6 +161,7 @@ export type CustomerReportRow = {
   reservationCount: number;
   totalPaid: number;
   finesTotal: number;
+  refundsTotal: number;
 };
 
 export async function getCustomerReport(): Promise<CustomerReportRow[]> {
@@ -142,29 +173,36 @@ export async function getCustomerReport(): Promise<CustomerReportRow[]> {
   ] = await Promise.all([
     supabase.from("customers").select("id, name, phone"),
     supabase.from("reservations").select("id, customer_id, amount_paid"),
-    supabase.from("reservation_charges").select("reservation_id, amount"),
+    supabase.from("reservation_charges").select("reservation_id, amount, type"),
   ]);
   if (customersError) throw customersError;
   if (resError) throw resError;
   if (chargesError) throw chargesError;
 
-  const chargesByReservation = new Map<string, number>();
+  const finesByReservation = new Map<string, number>();
+  const refundsByReservation = new Map<string, number>();
   for (const c of charges ?? []) {
-    chargesByReservation.set(c.reservation_id, (chargesByReservation.get(c.reservation_id) ?? 0) + c.amount);
+    const map = c.type === "refund" ? refundsByReservation : finesByReservation;
+    map.set(c.reservation_id, (map.get(c.reservation_id) ?? 0) + c.amount);
   }
 
   return (customers ?? [])
     .map((customer) => {
       const customerReservations = (reservations ?? []).filter((r) => r.customer_id === customer.id);
-      const totalPaid = customerReservations.reduce((sum, r) => sum + (r.amount_paid ?? 0), 0);
-      const finesTotal = customerReservations.reduce((sum, r) => sum + (chargesByReservation.get(r.id) ?? 0), 0);
+      const paid = customerReservations.reduce((sum, r) => sum + (r.amount_paid ?? 0), 0);
+      const finesTotal = customerReservations.reduce((sum, r) => sum + (finesByReservation.get(r.id) ?? 0), 0);
+      const refundsTotal = customerReservations.reduce(
+        (sum, r) => sum + (refundsByReservation.get(r.id) ?? 0),
+        0
+      );
       return {
         customerId: customer.id,
         name: customer.name,
         phone: customer.phone,
         reservationCount: customerReservations.length,
-        totalPaid,
+        totalPaid: paid - refundsTotal,
         finesTotal,
+        refundsTotal,
       };
     })
     .sort((a, b) => b.totalPaid - a.totalPaid);
@@ -172,14 +210,14 @@ export async function getCustomerReport(): Promise<CustomerReportRow[]> {
 
 export type CarReservationRow = ReservationRow & {
   customers: Pick<CustomerRow, "id" | "name" | "phone"> | null;
-  reservation_charges: Pick<ReservationChargeRow, "id" | "amount" | "reason" | "created_at">[];
+  reservation_charges: Pick<ReservationChargeRow, "id" | "amount" | "type" | "reason" | "created_at">[];
 };
 
 export async function getReservationsForCar(carId: string): Promise<CarReservationRow[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("reservations")
-    .select("*, customers(id, name, phone), reservation_charges(id, amount, reason, created_at)")
+    .select("*, customers(id, name, phone), reservation_charges(id, amount, type, reason, created_at)")
     .eq("car_id", carId)
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -188,14 +226,14 @@ export async function getReservationsForCar(carId: string): Promise<CarReservati
 
 export type CustomerReservationRow = ReservationRow & {
   cars: Pick<CarRow, "id" | "title" | "images"> | null;
-  reservation_charges: Pick<ReservationChargeRow, "id" | "amount" | "reason" | "created_at">[];
+  reservation_charges: Pick<ReservationChargeRow, "id" | "amount" | "type" | "reason" | "created_at">[];
 };
 
 export async function getReservationsForCustomer(customerId: string): Promise<CustomerReservationRow[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("reservations")
-    .select("*, cars(id, title, images), reservation_charges(id, amount, reason, created_at)")
+    .select("*, cars(id, title, images), reservation_charges(id, amount, type, reason, created_at)")
     .eq("customer_id", customerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
