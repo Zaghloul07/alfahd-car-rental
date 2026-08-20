@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CarGallery from "@/components/CarGallery";
 import { getCarById } from "@/lib/cars";
 import { formatEGP, formatKm } from "@/lib/format";
 
@@ -30,9 +30,7 @@ export default async function BuyDetailPage({
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-4 py-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-placeholder">
-              <Image src={car.images[0] ?? "/cars/sedan-silver.svg"} alt={car.title} fill className="object-cover" />
-            </div>
+            <CarGallery images={car.images} alt={car.title} />
 
             <div>
               <h1 className="text-2xl font-bold">{car.title}</h1>

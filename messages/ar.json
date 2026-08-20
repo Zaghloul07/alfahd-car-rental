@@ -60,7 +60,9 @@
     "contactWhatsapp": "عندك سؤال؟ تواصل معنا عبر واتساب",
     "sendOffer": "أرسل عرض سعر عبر واتساب",
     "priceNegotiable": "السعر قابل للتفاوض",
-    "installments": "التقسيط متاح"
+    "installments": "التقسيط متاح",
+    "previousPhoto": "الصورة السابقة",
+    "nextPhoto": "الصورة التالية"
   },
   "Reservation": {
     "checkAvailabilityTitle": "تحقق من التوفر واحجز",

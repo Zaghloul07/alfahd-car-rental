@@ -60,7 +60,9 @@
     "contactWhatsapp": "Have a question? Contact us on WhatsApp",
     "sendOffer": "Send Price Offer via WhatsApp",
     "priceNegotiable": "Price negotiable",
-    "installments": "Installments available"
+    "installments": "Installments available",
+    "previousPhoto": "Previous photo",
+    "nextPhoto": "Next photo"
   },
   "Reservation": {
     "checkAvailabilityTitle": "Check availability & reserve",
