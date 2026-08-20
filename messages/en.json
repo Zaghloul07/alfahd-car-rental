@@ -335,7 +335,7 @@
     "bodyAngle_left": "Left side",
     "bodyAngle_right": "Right side",
     "aiDamageCheck": "AI damage check",
-    "aiDamageDisclaimer": "Automatically flagged by comparing delivery and return photos — please verify before charging the customer.",
+    "aiDamageDisclaimer": "Automatically flagged by comparing delivery and return photos, including a rough repair cost estimate — please verify both before charging the customer.",
     "removePhoto": "Remove photo",
     "customerSignature": "Customer signature",
     "signatureHint": "Hand the device to the customer to sign above.",

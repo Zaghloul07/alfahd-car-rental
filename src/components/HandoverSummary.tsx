@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { ResolvedHandover } from "@/lib/handovers/photos";
 import type { HandoverDamageFindingRow } from "@/lib/supabase/types";
 import { formatEGP } from "@/lib/format";
@@ -19,7 +19,7 @@ export default async function HandoverSummary({
   period?: RentalPeriod;
   findings?: HandoverDamageFindingRow[];
 }) {
-  const t = await getTranslations("Handover");
+  const [t, locale] = await Promise.all([getTranslations("Handover"), getLocale()]);
 
   const pricing =
     handover.type === "return" && handover.return_date && period
@@ -77,9 +77,16 @@ export default async function HandoverSummary({
           <p className="text-sm font-medium text-amber-800 dark:text-amber-400">{t("aiDamageCheck")}</p>
           <ul className="mt-1 space-y-1 text-sm text-amber-800/90 dark:text-amber-400/90">
             {findings.map((f) => (
-              <li key={f.id}>
-                <span className="font-medium">{t(`bodyAngle_${f.angle}`)}: </span>
-                {f.finding}
+              <li key={f.id} className="flex items-baseline justify-between gap-4">
+                <span>
+                  <span className="font-medium">{t(`bodyAngle_${f.angle}`)}: </span>
+                  {locale === "ar" ? (f.finding_ar ?? f.finding_en) : f.finding_en}
+                </span>
+                {f.estimated_cost_egp != null && (
+                  <span className="whitespace-nowrap font-medium">
+                    ~{formatEGP(f.estimated_cost_egp)}
+                  </span>
+                )}
               </li>
             ))}
           </ul>

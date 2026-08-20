@@ -3,16 +3,32 @@ import type { createClient } from "@/lib/supabase/server";
 import type { DamageAngle, HandoverPhotoType, HandoverType } from "@/lib/supabase/types";
 
 const BODY_ANGLES: DamageAngle[] = ["front", "back", "left", "right"];
-const NO_DAMAGE_MARKER = "NO NEW DAMAGE";
 
 const PROMPT = (angle: string) =>
   `You are inspecting a rental car for new damage. The first image is the ${angle} of the car ` +
   `taken at delivery (before the rental); the second image is the same ${angle} taken at return ` +
   `(after the rental). Compare them and identify any NEW damage visible in the second image that ` +
   `is not present in the first — scratches, dents, cracks, broken parts, etc. Ignore differences in ` +
-  `lighting, angle, dirt, or reflections. If there is no new damage, respond with exactly ` +
-  `"${NO_DAMAGE_MARKER}" and nothing else. Otherwise, briefly list each new damage point in one ` +
-  `short sentence each, no preamble.`;
+  `lighting, angle, dirt, or reflections.\n\n` +
+  `For each distinct new damage point you find, provide a short one-sentence description in English, ` +
+  `the same description translated into Arabic, and a rough estimated repair cost in Egyptian Pounds ` +
+  `(EGP) based on typical repair/paint-shop costs for that kind of damage in Egypt. If there is no new ` +
+  `damage, return an empty array.`;
+
+const RESPONSE_SCHEMA = {
+  type: "ARRAY",
+  items: {
+    type: "OBJECT",
+    properties: {
+      descriptionEn: { type: "STRING" },
+      descriptionAr: { type: "STRING" },
+      estimatedCostEgp: { type: "NUMBER" },
+    },
+    required: ["descriptionEn", "descriptionAr", "estimatedCostEgp"],
+  },
+};
+
+type DamageItem = { descriptionEn: string; descriptionAr: string; estimatedCostEgp: number };
 
 async function fetchImageAsBase64(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -27,7 +43,7 @@ async function fetchImageAsBase64(
 async function callGeminiVision(
   prompt: string,
   images: { data: string; mimeType: string }[]
-): Promise<string | null> {
+): Promise<DamageItem[] | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
@@ -45,6 +61,10 @@ async function callGeminiVision(
             ],
           },
         ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: RESPONSE_SCHEMA,
+        },
       }),
     }
   );
@@ -55,14 +75,23 @@ async function callGeminiVision(
 
   const json = await response.json();
   const text: string | undefined = json?.candidates?.[0]?.content?.parts?.[0]?.text;
-  return text?.trim() || null;
+  if (!text) return null;
+
+  try {
+    const parsed = JSON.parse(text);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (err) {
+    console.error("Gemini returned unparseable JSON:", err, text);
+    return null;
+  }
 }
 
 /**
  * Compares delivery vs. return body photos angle-by-angle via Gemini and
- * stores any new-damage descriptions. Best-effort: skipped silently if
- * GEMINI_API_KEY isn't set, and a failure on one angle never blocks the
- * others or the caller.
+ * stores any new-damage findings (bilingual description + a rough EGP
+ * repair-cost estimate). Best-effort: skipped silently if GEMINI_API_KEY
+ * isn't set, and a failure on one angle never blocks the others or the
+ * caller.
  */
 export async function detectReturnDamage(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -102,14 +131,18 @@ export async function detectReturnDamage(
         ]);
         if (!before || !after) return;
 
-        const finding = await callGeminiVision(PROMPT(angle), [before, after]);
-        if (!finding || finding.toUpperCase().includes(NO_DAMAGE_MARKER)) return;
+        const items = await callGeminiVision(PROMPT(angle), [before, after]);
+        if (!items || items.length === 0) return;
 
-        await supabase.from("handover_damage_findings").insert({
-          reservation_id: reservationId,
-          angle,
-          finding,
-        });
+        await supabase.from("handover_damage_findings").insert(
+          items.map((item) => ({
+            reservation_id: reservationId,
+            angle,
+            finding_en: item.descriptionEn,
+            finding_ar: item.descriptionAr,
+            estimated_cost_egp: item.estimatedCostEgp,
+          }))
+        );
       } catch (err) {
         console.error(`detectReturnDamage failed for angle ${angle}:`, err);
       }

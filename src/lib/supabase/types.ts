@@ -144,7 +144,9 @@ export type HandoverDamageFindingRow = {
   id: string;
   reservation_id: string;
   angle: DamageAngle;
-  finding: string;
+  finding_en: string;
+  finding_ar: string | null;
+  estimated_cost_egp: number | null;
   created_at: string;
 };
 
@@ -232,7 +234,7 @@ export type Database = {
         Insert: Partial<HandoverDamageFindingRow> & {
           reservation_id: string;
           angle: DamageAngle;
-          finding: string;
+          finding_en: string;
         };
         Update: Partial<HandoverDamageFindingRow>;
         Relationships: [];
