@@ -139,6 +139,7 @@ export async function submitHandover(
       .eq("id", reservationId);
     if (statusError) throw statusError;
   } catch (err) {
+    console.error("submitHandover failed:", err);
     return { error: err instanceof Error ? err.message : "Could not save the inspection. Please try again." };
   }
 

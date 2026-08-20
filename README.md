@@ -47,7 +47,8 @@ In the Supabase dashboard, open **SQL Editor** and run, in order:
 11. `supabase/schema_customer_notifications.sql` — lets `notifications` target a specific customer (not just an admin/inspector role broadcast) and updates `create_notification()` to accept it
 12. `supabase/schema_reservation_transactions.sql` — adds a `type` (`charge` | `refund`) to `reservation_charges` so early-return refunds can be logged alongside damage/late fees, and adds the `refund_issued` notification type
 13. `supabase/schema_damage_findings_cost.sql` — adds an Arabic translation and an estimated EGP repair cost to each AI damage finding (renames `finding` to `finding_en`)
-14. `supabase/seed.sql` — adds 3 sample rent listings and 3 sample sale listings (optional, for local dev)
+14. `supabase/schema_inspector_return_rls_fix.sql` — fixes a bug where an inspector could record a delivery but not a return: the reservations UPDATE policy had no `WITH CHECK`, so Postgres reused the `USING` clause (which only allowed `confirmed`/`delivered`) to validate the new row too, silently rejecting the status change to `completed`
+15. `supabase/seed.sql` — adds 3 sample rent listings and 3 sample sale listings (optional, for local dev)
 
 Also in **Authentication → Sign In / Providers**, turn **off** "Confirm email" — customer signup has no email/SMS step yet, so a stuck "unconfirmed" account would be unable to ever sign in.
 
