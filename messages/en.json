@@ -292,7 +292,20 @@
     "selectRole": "Select role",
     "create": "Create Account",
     "creating": "Creating…",
-    "createdSuccess": "Account created."
+    "createdSuccess": "Account created.",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "locked": "Locked",
+    "lock": "Lock",
+    "unlock": "Unlock",
+    "confirmLock": "Lock this account? They won't be able to sign in until you unlock it.",
+    "confirmUnlock": "Unlock this account and allow them to sign in again?",
+    "resetPassword": "Reset password",
+    "newPassword": "New password",
+    "save": "Save",
+    "saving": "Saving…",
+    "passwordUpdated": "Password updated."
   },
   "Charges": {
     "chargesTitle": "Charges",

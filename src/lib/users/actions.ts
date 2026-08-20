@@ -41,3 +41,39 @@ export async function createTeamUser(
   revalidatePath("/admin-portal/users");
   return { success: true };
 }
+
+export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
+
+export async function resetTeamUserPassword(
+  userId: string,
+  _state: ResetPasswordState,
+  formData: FormData
+): Promise<ResetPasswordState> {
+  await requireAdmin();
+
+  const password = String(formData.get("password") ?? "");
+  if (password.length < 8) return { error: "Password must be at least 8 characters." };
+
+  const adminClient = createAdminClient();
+  const { error } = await adminClient.auth.admin.updateUserById(userId, { password });
+  if (error) return { error: error.message };
+
+  return { success: true };
+}
+
+// A ban_duration this long has no practical expiry — Supabase requires a
+// duration string rather than a boolean/permanent flag for locking a user.
+const LOCK_DURATION = "876000h";
+
+export async function setTeamUserLocked(userId: string, locked: boolean) {
+  const admin = await requireAdmin();
+  if (userId === admin.id) throw new Error("You can't lock your own account.");
+
+  const adminClient = createAdminClient();
+  const { error } = await adminClient.auth.admin.updateUserById(userId, {
+    ban_duration: locked ? LOCK_DURATION : "none",
+  });
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin-portal/users");
+}
