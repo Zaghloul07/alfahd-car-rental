@@ -23,7 +23,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-white dark:bg-black">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-          <Link href="/admin-portal" className="flex shrink-0 items-center gap-3">
+          <Link
+            href={isFullAdmin ? "/admin-portal" : "/admin-portal/handovers"}
+            className="flex shrink-0 items-center gap-3"
+          >
             <Logo className="h-10 w-auto sm:h-14" priority />
             <span className="hidden text-lg font-bold text-brand sm:inline">{t("brand")}</span>
           </Link>

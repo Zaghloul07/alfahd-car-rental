@@ -36,22 +36,12 @@ export async function updateSession(request: NextRequest, response: NextResponse
   // downstream see a valid session instead of a stale/expired cookie.
   const {
     data: { user },
-    error: userError,
   } = await supabase.auth.getUser();
 
   const { locale, rest } = stripLocale(request.nextUrl.pathname);
   const isAdminRoute = rest.startsWith("/admin-portal");
   const isAdminLoginRoute = rest === "/admin-portal/login";
   const isAccountRoute = rest.startsWith("/account");
-
-  if (isAdminRoute) {
-    console.error("[auth-debug] middleware:", {
-      rest,
-      hasUser: !!user,
-      userError: userError?.message,
-      hasCookie: request.cookies.getAll().some((c) => c.name.includes("auth-token")),
-    });
-  }
 
   if (isAdminRoute && !isAdminLoginRoute && !user) {
     const url = request.nextUrl.clone();

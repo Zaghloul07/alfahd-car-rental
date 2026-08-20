@@ -38,25 +38,15 @@ export const getCurrentInspectorOrAdmin = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
-    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    console.error("[auth-debug] getCurrentInspectorOrAdmin: no user from getUser()", userError?.message);
-    return null;
-  }
+  if (!user) return null;
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile } = await supabase
     .from("profiles")
     .select("id, email, is_admin, role, created_at")
     .eq("id", user.id)
     .maybeSingle();
-
-  console.error("[auth-debug] getCurrentInspectorOrAdmin:", {
-    userId: user.id,
-    profile,
-    profileError: profileError?.message,
-  });
 
   if (!profile || (!profile.is_admin && profile.role !== "inspector")) return null;
 

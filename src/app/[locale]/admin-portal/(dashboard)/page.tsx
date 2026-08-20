@@ -1,13 +1,17 @@
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
-import { requireAdmin } from "@/lib/auth/dal";
+import { getTranslations, getLocale } from "next-intl/server";
+import { Link, redirect } from "@/i18n/navigation";
+import { requireInspectorOrAdmin } from "@/lib/auth/dal";
 import { getAllCarsForAdmin } from "@/lib/cars";
 import { formatEGP } from "@/lib/format";
 import DeleteCarButton from "./DeleteCarButton";
 
 export default async function AdminDashboardPage() {
-  await requireAdmin();
+  const admin = await requireInspectorOrAdmin();
+  if (!admin.is_admin) {
+    const locale = await getLocale();
+    redirect({ href: "/admin-portal/handovers", locale });
+  }
   const [t, cars] = await Promise.all([
     getTranslations("AdminDashboard"),
     getAllCarsForAdmin(),
