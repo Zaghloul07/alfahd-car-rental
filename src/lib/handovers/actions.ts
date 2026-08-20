@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireInspectorOrAdmin } from "@/lib/auth/dal";
@@ -141,17 +142,23 @@ export async function submitHandover(
     return { error: err instanceof Error ? err.message : "Could not save the inspection. Please try again." };
   }
 
-  if (type === "return") {
-    await detectReturnDamage(supabase, reservationId);
-  }
+  // Runs after the response is sent: the AI damage comparison (return only)
+  // can take several seconds across 4 angles and must never make the
+  // inspector's save wait on it or risk the request timing out after the
+  // data above has already been committed.
+  after(async () => {
+    if (type === "return") {
+      await detectReturnDamage(supabase, reservationId);
+    }
 
-  await createNotification({
-    recipientRole: "customer",
-    customerId: reservation.customer_id,
-    type: type === "delivery" ? "handover_delivered" : "handover_returned",
-    reservationId,
-    message: type === "delivery" ? "Your car has been delivered." : "Your car return has been processed.",
-    link: `/account/reservations`,
+    await createNotification({
+      recipientRole: "customer",
+      customerId: reservation.customer_id,
+      type: type === "delivery" ? "handover_delivered" : "handover_returned",
+      reservationId,
+      message: type === "delivery" ? "Your car has been delivered." : "Your car return has been processed.",
+      link: `/account/reservations`,
+    });
   });
 
   revalidatePath("/", "layout");
