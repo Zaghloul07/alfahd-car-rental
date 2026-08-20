@@ -238,6 +238,7 @@
     "amountPaid": "المبلغ المدفوع (جنيه)",
     "markPaid": "تسجيل الدفع",
     "confirmReservation": "تأكيد الحجز",
+    "confirmReturn": "تأكيد الاستلام",
     "cancel": "إلغاء",
     "saving": "جارٍ الحفظ…"
   },
@@ -277,7 +278,8 @@
     "title": "التسليم والاستلام",
     "noReservations": "لا توجد حجوزات بانتظار التسليم أو الاستلام.",
     "carGone": "السيارة لم تعد مدرجة",
-    "unknownCustomer": "عميل غير معروف"
+    "unknownCustomer": "عميل غير معروف",
+    "returnAwaitingConfirmation": "تم تسجيل الاستلام — بانتظار تأكيد الإدارة."
   },
   "AdminUsers": {
     "title": "حسابات الفريق",

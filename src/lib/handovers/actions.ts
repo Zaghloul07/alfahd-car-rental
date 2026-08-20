@@ -133,11 +133,16 @@ export async function submitHandover(
       .insert(photoRows.map((p) => ({ handover_id: handoverId, ...p })));
     if (photosError) throw photosError;
 
-    const { error: statusError } = await supabase
-      .from("reservations")
-      .update({ status: type === "delivery" ? "delivered" : "completed" })
-      .eq("id", reservationId);
-    if (statusError) throw statusError;
+    // Return doesn't move the reservation to "completed" here - an admin
+    // reviews the AI damage findings and adds any charges via confirmReturn
+    // before it's finalized. Delivery has no such review step.
+    if (type === "delivery") {
+      const { error: statusError } = await supabase
+        .from("reservations")
+        .update({ status: "delivered" })
+        .eq("id", reservationId);
+      if (statusError) throw statusError;
+    }
   } catch (err) {
     console.error("submitHandover failed:", err);
     return { error: err instanceof Error ? err.message : "Could not save the inspection. Please try again." };
@@ -150,14 +155,15 @@ export async function submitHandover(
   after(async () => {
     if (type === "return") {
       await detectReturnDamage(supabase, reservationId);
+      return;
     }
 
     await createNotification({
       recipientRole: "customer",
       customerId: reservation.customer_id,
-      type: type === "delivery" ? "handover_delivered" : "handover_returned",
+      type: "handover_delivered",
       reservationId,
-      message: type === "delivery" ? "Your car has been delivered." : "Your car return has been processed.",
+      message: "Your car has been delivered.",
       link: `/account/reservations`,
     });
   });

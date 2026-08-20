@@ -122,6 +122,47 @@ export async function confirmReservation(reservationId: string) {
   revalidatePath("/", "layout");
 }
 
+export async function confirmReturn(reservationId: string) {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { data: reservation, error: fetchError } = await supabase
+    .from("reservations")
+    .select("status, customer_id")
+    .eq("id", reservationId)
+    .single();
+  if (fetchError || !reservation) throw new Error("Reservation not found.");
+  if (reservation.status !== "delivered") {
+    throw new Error("Only a delivered reservation can have its return confirmed.");
+  }
+
+  const { count } = await supabase
+    .from("handover_reports")
+    .select("id", { count: "exact", head: true })
+    .eq("reservation_id", reservationId)
+    .eq("type", "return");
+  if (!count) {
+    throw new Error("The return inspection hasn't been submitted yet.");
+  }
+
+  const { error } = await supabase
+    .from("reservations")
+    .update({ status: "completed" })
+    .eq("id", reservationId);
+  if (error) throw new Error(error.message);
+
+  await createNotification({
+    recipientRole: "customer",
+    customerId: reservation.customer_id,
+    type: "handover_returned",
+    reservationId,
+    message: "Your car return has been processed.",
+    link: `/account/reservations`,
+  });
+
+  revalidatePath("/", "layout");
+}
+
 export async function cancelReservation(reservationId: string) {
   await requireAdmin();
   const supabase = await createClient();

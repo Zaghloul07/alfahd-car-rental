@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { getReservationsForHandoverQueue } from "@/lib/reservations/handover-queue";
 import { getHandoversForReservation } from "@/lib/handovers";
 import { resolveHandoverForDisplay } from "@/lib/handovers/photos";
+import { getDamageFindingsForReservation } from "@/lib/handovers/findings";
 import HandoverSummary from "@/components/HandoverSummary";
 import HandoverForm from "../reservations/HandoverForm";
 import HighlightTarget from "@/components/admin/HighlightTarget";
@@ -19,10 +20,12 @@ export default async function AdminHandoversPage() {
       const handovers = await Promise.all(
         (await getHandoversForReservation(r.id)).map(resolveHandoverForDisplay)
       );
+      const returnHandover = handovers.find((h) => h.type === "return") ?? null;
       return {
         ...r,
         delivery: handovers.find((h) => h.type === "delivery") ?? null,
-        return: handovers.find((h) => h.type === "return") ?? null,
+        return: returnHandover,
+        damageFindings: returnHandover ? await getDamageFindingsForReservation(r.id) : [],
       };
     })
   );
@@ -82,7 +85,11 @@ export default async function AdminHandoversPage() {
                       ? { startDate: r.start_date, endDate: r.end_date, dailyPrice: r.cars.daily_price }
                       : undefined
                   }
+                  findings={r.damageFindings}
                 />
+                {r.status === "delivered" && (
+                  <p className="mt-2 text-xs text-foreground/50">{t("returnAwaitingConfirmation")}</p>
+                )}
               </div>
             )}
             {r.status === "delivered" && !r.return && (

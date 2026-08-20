@@ -238,6 +238,7 @@
     "amountPaid": "Amount paid (EGP)",
     "markPaid": "Mark as Paid",
     "confirmReservation": "Confirm Reservation",
+    "confirmReturn": "Confirm Return",
     "cancel": "Cancel",
     "saving": "Saving…"
   },
@@ -277,7 +278,8 @@
     "title": "Deliveries & Returns",
     "noReservations": "No reservations awaiting delivery or return.",
     "carGone": "Car no longer listed",
-    "unknownCustomer": "Unknown customer"
+    "unknownCustomer": "Unknown customer",
+    "returnAwaitingConfirmation": "Return submitted — awaiting admin confirmation."
   },
   "AdminUsers": {
     "title": "Team Accounts",

@@ -15,6 +15,7 @@ import HighlightTarget from "@/components/admin/HighlightTarget";
 import ReservationActions from "./ReservationActions";
 import ReservationConfirmPanel from "./ReservationConfirmPanel";
 import CancelReservationButton from "./CancelReservationButton";
+import ConfirmReturnButton from "./ConfirmReturnButton";
 import HandoverForm from "./HandoverForm";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -42,6 +43,7 @@ export default async function AdminReservationsPage() {
       const handovers = HANDOVER_STATUSES.has(r.status)
         ? await Promise.all((await getHandoversForReservation(r.id)).map(resolveHandoverForDisplay))
         : [];
+      const returnHandover = handovers.find((h) => h.type === "return") ?? null;
       return {
         ...r,
         docs: {
@@ -51,9 +53,9 @@ export default async function AdminReservationsPage() {
         },
         docsComplete: r.customers ? hasSubmittedDocuments(r.customers) : false,
         delivery: handovers.find((h) => h.type === "delivery") ?? null,
-        return: handovers.find((h) => h.type === "return") ?? null,
+        return: returnHandover,
         charges: r.status === "completed" ? await getChargesForReservation(r.id) : [],
-        damageFindings: r.status === "completed" ? await getDamageFindingsForReservation(r.id) : [],
+        damageFindings: returnHandover ? await getDamageFindingsForReservation(r.id) : [],
       };
     })
   );
@@ -153,6 +155,11 @@ export default async function AdminReservationsPage() {
             )}
             {r.status === "delivered" && !r.return && (
               <HandoverForm reservationId={r.id} type="return" />
+            )}
+            {r.status === "delivered" && r.return && (
+              <div className="mt-4 flex justify-end">
+                <ConfirmReturnButton reservationId={r.id} />
+              </div>
             )}
 
             {r.status === "completed" && (
