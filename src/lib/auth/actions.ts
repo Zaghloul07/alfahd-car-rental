@@ -18,14 +18,17 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error || !data.user) {
+    console.error("[auth-debug] login: signInWithPassword failed", error?.message);
     return { error: "Invalid email or password." };
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("is_admin, role")
     .eq("id", data.user.id)
     .maybeSingle();
+
+  console.error("[auth-debug] login:", { userId: data.user.id, profile, profileError: profileError?.message });
 
   if (!profile || (!profile.is_admin && profile.role !== "inspector")) {
     await supabase.auth.signOut();
